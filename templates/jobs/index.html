@@ -22,9 +22,6 @@
           </div>
        <!-- END MODAL -->
 
-
-
-
         <div class="list-group list-group-flush mb-3">
             <div id="accordion">
            {% for grouper, job in jobs|groupby('date')|sort(attribute='grouper', reverse = True) %}
