@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block  content%}
+<div class="content container mt-3">
+    <header><h3><i class="fa fa-cube" aria-hidden="true"></i> Add a Filament</h3></header>
+     <hr>
+    <section class="add-filament-form">
+        <form id="new-filament" action="/filaments/new" method="post">
+            <div class="form-row">
+                <div class="form-group input-group col-md-4">
+                    <input class="form-control" type="text" id="cor" name="cor" placeholder="Filament Color" required />
+                </div>
+                 <div class="form-group input-group col-md-4">
+                    <input class="form-control" type="text" id="temp" name="temp" placeholder="Temperature" required />
+                </div>
+                 <div class="form-group input-group col-md-4">
+                    <input class="form-control" type="text" id="filament_type" name="filament_type" placeholder="Filament Type" required />
+                </div>
+                 <div class="form-group input-group col-md-4">
+                    <input class="form-control" type="text" id="provider" name="provider" placeholder="Provider" required />
+                </div>
+                 <div class="form-group input-group col-md-4">
+                    <input class="form-control" type="text" id="cost" name="cost" placeholder="Cost for 1KG" required />
+                </div>
+                <div class="form-group input-group col-md-4">
+                    <input class="form-control" type="text" id="quality" name="quality" placeholder="Quality (1-5)" required />
+                </div>
+                <div class="form-group input-group col-md-4">
+                    <input class="form-control" type="text" id="stock" name="stock" placeholder="Product stock quantity" required />
+                </div>
+                <div class="form-group input-group col-md-4">
+                    <input class="form-control" type="text" id="weight" name="weight" placeholder="ex: 1KG or 4K" required />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a class="btn btn-secondary" href="{{url_for('filaments.index')}}"> Cancel </a>
+        </form>
+    </section>
+</div>
+{% endblock %}

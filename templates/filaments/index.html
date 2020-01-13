@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block  content%}
+<div class="content container mt-3">
+    <header><h3><i class="fa fa-cubes" aria-hidden="true"></i> Filament List:</h3></header>
+    <hr>
+    <section>
+        <div class="list-group list-group-flush mb-3">
+            <div id="accordion">
+           {% for filament in filaments | sort(attribute='cor') %}
+                  <div class="card mb-1">
+                    <div class="card-header" id='heading{{ filament._id }}'>
+                      <h5 class="float-left mb-0 col-md-10">
+                        <a class="btn btn-link col-md-12 text-left" data-toggle="collapse" data-target='#collapse{{ filament._id }}' aria-expanded="false" aria-controls='collapse{{ filament._id }}'>
+                          <i class="fa fa-cube" aria-hidden="true"></i> {{filament.filament_type}} -  {{filament.cor}}  |   {{filament.provider}}
+                        </a>
+                      </h5>
+                         <div id="options" class="col-md-2 float-right text-right mb-0 mt-1">
+                              <span><a title="edit" class="btn btn-primary btn-sm" href="{{url_for('filaments.edit_filament', filament_id=filament._id)}}"><i class="fa fa-pencil" aria-hidden="true"></i></a></span>
+                              <span><a title="delete" data-id='{{filament._id}}' class="btn btn-danger btn-sm conf-delete text-white"><i class="fa fa-trash" aria-hidden="true"></i></a></span>
+                         </div>
+                    </div>
+
+                    <div id='collapse{{ filament._id }}' class="collapse mb-2" aria-labelledby='heading{{ filament._id }}' data-parent="#accordion">
+                      <div class="card-body">
+                          <ul class="list-group list-group-flush col-md-6 float-left">
+                              <li class="list-group-item">Stock: {{filament.stock}}</li>
+                              <li class="list-group-item">Temperature: {{filament.temp}}</li>
+                              <li class="list-group-item">Weight: {{filament.weight}}</li>
+                              <li class="list-group-item">Cost: {{ filament.cost }}</li>
+                              <li class="list-group-item">Quality: {{ filament.quality }}</li>
+                          </ul>
+                      </div>
+                    </div>
+                  </div>
+            {% endfor %}
+            </div>
+        </div>
+         <a class="btn btn-primary" href="{{url_for('filaments.new_filament')}}"> Create New </a>
+    </section>
+</div>
+<script type="text/javascript">
+ $(".conf-delete").click(function(){
+    var id = $(this).data('id');
+    bootbox.confirm("Are you sure?", function(result) {
+      if(result)
+          window.location = '/filaments/delete/' + id;
+    });
+  });
+</script>
+{% endblock %}

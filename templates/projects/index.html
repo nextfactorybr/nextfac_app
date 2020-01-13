@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block  content%}
+<div class="content container mt-3">
+
+    <!--Navbar-->
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand"><i class="fa fa-file-code-o" aria-hidden="true"></i> Project List</a>
+        <!-- Search form -->
+    <form action="/projects/search" method="post" class="form-inline">
+        <input name="parameter" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
+    </form>
+    </nav>
+    <!--/.Navbar-->
+    <hr>
+    <section>
+        <div class="list-group list-group-flush mb-3">
+            <table class="table">
+              <thead class="thead-dark">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Print Time</th>
+                  <th scope="col">Weight</th>
+                  <th scope="col">Shift</th>
+                  <th scope="col">Path</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+           {% for project in projects | sort(attribute='path') | sort(attribute='name') %}
+                <tr>
+                  <th scope="row">{{ loop.index }}</th>
+                  <td>{{project.name}}</td>
+                  <td>{{project.time}}</td>
+                  <td>{{project.weight}}</td>
+                  <td>{{project.shift.desc}}</td>
+                  <td>{{project.path}}</td>
+                  <td>
+                    <span><a title="edit" class="btn btn-primary btn-sm" href="{{url_for('projects.edit_project', project_id=project._id)}}"><i class="fa fa-pencil" aria-hidden="true"></i></a></span>
+                    <span><a title="delete" data-id='{{project._id}}' class="btn btn-danger btn-sm conf-delete text-white"><i class="fa fa-trash" aria-hidden="true"></i></a></span>
+                  </td>
+                </tr>
+            {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a class="btn btn-primary" href="{{url_for('projects.new_project')}}"> Create New </a>
+    </section>
+</div>
+<script type="text/javascript">
+ $(".conf-delete").click(function(){
+    var id = $(this).data('id');
+    bootbox.confirm("Are you sure?", function(result) {
+      if(result)
+          window.location = '/projects/delete/' + id;
+    });
+  });
+</script>
+{% endblock %}
