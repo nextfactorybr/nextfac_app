@@ -182,7 +182,6 @@ class Job:
         for job in jobs:
             if job.status is True:
                 con = OctoRest(url=job.printer.url, apikey=job.printer.apikey)
-                print(job.printer.url)
                 if con.state() != "Printing":
                     try:
                         Printer.connect(job.printer_id)

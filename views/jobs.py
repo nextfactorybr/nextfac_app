@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Blueprint, request, render_template, make_response, redirect, url_for, jsonify, render_template_string
+from flask import Blueprint, request, render_template, make_response, redirect, url_for, jsonify
 import pdfkit
 
 from models.filament import Filament

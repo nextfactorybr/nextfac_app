@@ -16,6 +16,7 @@ pymysql = "*"
 pdfkit = "*"
 xhtml2pdf = "*"
 fpdf = "*"
+flask-paginate = "*"
 
 [requires]
 python_version = "3.7"
