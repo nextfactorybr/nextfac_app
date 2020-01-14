@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask import Blueprint, request, render_template, make_response, redirect, url_for, jsonify
+from flask_paginate import Pagination, get_page_parameter
 import pdfkit
 
 from models.filament import Filament
@@ -11,10 +12,28 @@ from models.shift import Shift
 job_blueprints = Blueprint("jobs", __name__)
 
 
-@job_blueprints.route('/')
+@job_blueprints.route('/', methods=['GET'])
 def index():
+
+    counter = Job.jobs_amount()
     jobs = Job.all()
-    return render_template('jobs/index.html', jobs=jobs, now=datetime.today().strftime('%Y-%m-%d'))
+
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+
+    per_page = 6
+    offset = 3 * page
+    start = (page-1)*3
+
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+
+    pagination = Pagination(page=page, per_page=per_page, css_framework='bootstrap4', offset=offset, total=counter,
+                            search=search, record_name='jobs')
+
+    return render_template('jobs/index.html', jobs=jobs, now=datetime.today().strftime('%Y-%m-%d'),
+                           pagination=pagination, offset=offset, start=start)
 
 
 @job_blueprints.route('/new', methods=['GET', 'POST'])

@@ -159,6 +159,30 @@ class Job:
             ])
         return results
 
+    @classmethod
+    def jobs_amount(cls):
+        results = Database.DATABASE[cls.collection].aggregate(
+            [
+                {"$lookup": {
+                    "from": "shifts",
+                    "localField": "shift_id",
+                    "foreignField": "_id",
+                    "as": "fromshifts"
+                }},
+                {"$group": {
+                    "_id": {"date": "$date", "shift": ["$fromshifts._id", "$fromshifts.desc"]},
+
+                }},
+
+                {"$sort": {"_id.date": -1, "_id.shift": 1}}
+            ])
+
+        counter = 0
+        for result in results:
+            counter = counter + 1
+
+        return counter
+
     @staticmethod
     def start_all(date, shift_id):
         disconnected_list = []
