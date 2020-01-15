@@ -23,6 +23,14 @@ def index():
     offset = 3 * page
     start = (page - 1) * 3
 
+    view = {
+        "title": "Job List",
+        "icon": "fa-archive",
+        "name": "jobs",
+        "nav_on": True,
+        "search_on": True
+    }
+
     search = False
     q = request.args.get('q')
     if q:
@@ -32,7 +40,7 @@ def index():
                             search=search, record_name='jobs')
 
     return render_template('jobs/index.html', jobs=jobs, now=datetime.today().strftime('%Y-%m-%d'),
-                           pagination=pagination, offset=offset, start=start)
+                           pagination=pagination, offset=offset, start=start, view=view)
 
 
 @job_blueprints.route('/new', methods=['GET', 'POST'])
@@ -70,13 +78,22 @@ def new_job():
 
         return redirect(url_for('jobs.index'))
     else:
+
+        view = {
+            "title": "Job List",
+            "icon": "fa-archive",
+            "name": "jobs",
+            "nav_on": True,
+            "search_on": False
+        }
+
         shifts = Shift.all()
         printers = Printer.all()
         projects = Project.all()
         filaments = Filament.all()
         latest_jobs = Job.get_latest_jobs()
         return render_template('jobs/new_job.html', shifts=shifts, printers=printers, projects=projects,
-                               filaments=filaments, latest_jobs=latest_jobs)
+                               filaments=filaments, latest_jobs=latest_jobs, view=view)
 
 
 @job_blueprints.route('/edit/<string:job_id>', methods=['GET', 'POST'])
@@ -96,7 +113,14 @@ def edit_job(job_id):
         return redirect(url_for('jobs.index'))
 
     else:
-        return render_template('jobs/edit_job.html', job=job, filaments=filaments, projects=projects)
+        view = {
+            "title": "Job List",
+            "icon": "fa-archive",
+            "name": "jobs",
+            "nav_on": True,
+            "search_on": False
+        }
+        return render_template('jobs/edit_job.html', job=job, filaments=filaments, projects=projects, view=view)
 
 
 @job_blueprints.route('/delete/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])
@@ -118,9 +142,17 @@ def search():
 
         page = request.args.get(get_page_parameter(), type=int, default=1)
 
-        per_page = counter
+        per_page = counter if counter > 0 else 1
         offset = counter
         start = 0
+
+        view = {
+            "title": "Job List",
+            "icon": "fa-archive",
+            "name": "jobs",
+            "nav_on": True,
+            "search_on": True
+        }
 
         search = False
         q = request.args.get('q')
@@ -131,7 +163,7 @@ def search():
                                 search=search, record_name='jobs')
 
         return render_template('jobs/index.html', jobs=jobs, now=datetime.today().strftime('%Y-%m-%d'),
-                               pagination=pagination, offset=offset, start=start)
+                               pagination=pagination, offset=offset, start=start, view=view)
     else:
         return redirect(url_for('jobs.index'))
 

@@ -1,18 +1,5 @@
 {% extends "base.html" %}
 {% block  content%}
-<div class="content container mt-3">
-     <!--Navbar-->
-    <nav class="navbar navbar-light bg-light">
-        <a class="navbar-brand"><i class="fa fa-archive" aria-hidden="true"></i> Job Lists</a>
-        <span class="text-right">{{ pagination.info }}</span>
-        <!-- Search form -->
-    <form action="/jobs/search" method="post" class="form-inline">
-        <input name="parameter" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
-    </form>
-    </nav>
-    <!--/.Navbar-->
-    <hr>
    <section>
        <!-- THE MODAL WE WILL BE USING -->
           <div class="modal fade" id="modal-check">

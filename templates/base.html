@@ -26,9 +26,44 @@
 </head>
 <body>
 <div class="content container">
+<div class="content container mt-3">
+{% if view is defined and view.nav_on == True %}
+<!--Navbar-->
+<div class="pos-f-t">
+    <!--Menu-->
+    <div class="collapse" id="navbarToggleExternalContent">
+        <div class="bg-dark p-4">
+            <img class="pr-4 border-right" src="{{ static('images/logo_white.png', pdf=False) }}" height="55px">
+            <a class="btn btn-outline-light btn-lg ml-3" href="/jobs/"><i class="fa fa-archive"></i></a>
+            <a class="btn btn-outline-light btn-lg ml-1" href="/shifts/"><i class="fa fa-clock-o"></i></a>
+            <a class="btn btn-outline-light btn-lg ml-1" href="/printers/"><i class="fa fa-print"></i></a>
+            <a class="btn btn-outline-light btn-lg ml-1" href="/projects/"><i class="fa fa-file-code-o"></i></a>
+            <a class="btn btn-outline-light btn-lg ml-1" href="/filaments/"><i class="fa fa-cube"></i></a>
+            <a class="btn btn-outline-light btn-lg ml-1" href=""><i class="fa fa-cog"></i></a>
+        </div>
+    </div>
+    <!--/.Menu-->
+    <nav class="navbar navbar-light bg-light">
+     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon btn-sm"></span>
+    </button>
+    <a class="navbar-brand"><i class="fa {{view.icon}}" aria-hidden="true"></i> {{view.title}}</a>
+    {% if view.search_on %}
+    <span class="text-right">{{ pagination.info }}</span>
+    <!-- Search form -->
+    <form action="/{{view.name}}/search" method="post" class="form-inline">
+    <input name="parameter" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+    <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
+    </form>
+    {% endif %}
+    </nav>
+<!--/.Navbar-->
+<hr>
+{% endif %}
+
 {% block content %}
 
-{% endblock %}
+{% endblock content%}
 <br/><br/>
 </div>
    <!-- Optional JavaScript -->
