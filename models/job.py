@@ -258,3 +258,45 @@ class Job:
             ])
 
         return list(latest_jobs)
+
+    @classmethod
+    def get_by_search(cls, parameter):
+        results = Database.DATABASE[cls.collection].find(
+            {"$or":
+                [
+                    {"date": {"$regex": parameter, "$options": 'i'}},
+                    {"order_id": {"$regex": parameter, "$options": 'i'}}
+                ]
+            })
+
+        return [cls(**elem) for elem in results]
+
+    @classmethod
+    def search_amount(cls, parameter):
+        results = Database.DATABASE[cls.collection].aggregate(
+            [
+                {"$lookup": {
+                    "from": "shifts",
+                    "localField": "shift_id",
+                    "foreignField": "_id",
+                    "as": "fromshifts"
+                }},
+                {"$match": {"$or":
+                    [
+                        {"date": {"$regex": parameter, "$options": 'i'}},
+                        {"order_id": {"$regex": parameter, "$options": 'i'}}
+                    ]
+                }},
+                {"$group": {
+                    "_id": {"date": "$date", "shift": ["$fromshifts._id", "$fromshifts.desc"]},
+
+                }},
+
+                {"$sort": {"_id.date": -1, "_id.shift": 1}}
+            ])
+
+        counter = 0
+        for result in results:
+            counter = counter + 1
+
+        return counter

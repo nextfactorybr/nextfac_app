@@ -14,7 +14,6 @@ job_blueprints = Blueprint("jobs", __name__)
 
 @job_blueprints.route('/', methods=['GET'])
 def index():
-
     counter = Job.jobs_amount()
     jobs = Job.all()
 
@@ -22,7 +21,7 @@ def index():
 
     per_page = 6
     offset = 3 * page
-    start = (page-1)*3
+    start = (page - 1) * 3
 
     search = False
     q = request.args.get('q')
@@ -109,6 +108,34 @@ def remove_job(date, shift_id):
     return redirect(url_for('jobs.index'))
 
 
+@job_blueprints.route('/search', methods=['POST'])
+def search():
+    if request.method == 'POST' and request.form['parameter'] != "":
+        parameter = request.form['parameter']
+        jobs = Job.get_by_search(parameter)
+
+        counter = Job.search_amount(parameter)
+
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+
+        per_page = counter
+        offset = counter
+        start = 0
+
+        search = False
+        q = request.args.get('q')
+        if q:
+            search = True
+
+        pagination = Pagination(page=page, per_page=per_page, css_framework='bootstrap4', offset=offset, total=counter,
+                                search=search, record_name='jobs')
+
+        return render_template('jobs/index.html', jobs=jobs, now=datetime.today().strftime('%Y-%m-%d'),
+                               pagination=pagination, offset=offset, start=start)
+    else:
+        return redirect(url_for('jobs.index'))
+
+
 @job_blueprints.route('/heat/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])
 def heat_printers(date, shift_id):
     jobs = Job.find_many_by_date_shift(date, shift_id)
@@ -129,7 +156,7 @@ def start_jobs(date, shift_id):
 @job_blueprints.route('/start_one/job_id=<string:job_id>', methods=['GET'])
 def start_one(job_id):
     if Job.start_one(job_id):
-        return True #return tem que ser um redirect
+        return True  # return tem que ser um redirect
 
 
 @job_blueprints.route('/connectall/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])

@@ -4,7 +4,7 @@ from models import helpers
 from views.jobs import job_blueprints
 from views.printers import printer_blueprints
 from views.shifts import shift_blueprints
-from views.project import project_blueprints
+from views.projects import project_blueprints
 from views.filaments import filament_blueprints
 
 app = Flask(__name__)
