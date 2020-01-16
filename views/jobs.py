@@ -11,6 +11,14 @@ from models.shift import Shift
 
 job_blueprints = Blueprint("jobs", __name__)
 
+view = {
+        "title": "Job List",
+        "icon": "fa-archive",
+        "name": "jobs",
+        "nav_on": True,
+        "search_on": False
+    }
+
 
 @job_blueprints.route('/', methods=['GET'])
 def index():
@@ -23,18 +31,14 @@ def index():
     offset = 3 * page
     start = (page - 1) * 3
 
-    view = {
-        "title": "Job List",
-        "icon": "fa-archive",
-        "name": "jobs",
-        "nav_on": True,
-        "search_on": True
-    }
 
     search = False
     q = request.args.get('q')
     if q:
         search = True
+
+    view['title'] = "Jobs"
+    view['search_on'] = True
 
     pagination = Pagination(page=page, per_page=per_page, css_framework='bootstrap4', offset=offset, total=counter,
                             search=search, record_name='jobs')
@@ -79,13 +83,8 @@ def new_job():
         return redirect(url_for('jobs.index'))
     else:
 
-        view = {
-            "title": "Job List",
-            "icon": "fa-archive",
-            "name": "jobs",
-            "nav_on": True,
-            "search_on": False
-        }
+        view['title'] = "New jobs"
+        view['search_on'] = False
 
         shifts = Shift.all()
         printers = Printer.all()
@@ -113,13 +112,8 @@ def edit_job(job_id):
         return redirect(url_for('jobs.index'))
 
     else:
-        view = {
-            "title": "Job List",
-            "icon": "fa-archive",
-            "name": "jobs",
-            "nav_on": True,
-            "search_on": False
-        }
+        view['title'] = "Edit jobs"
+        view['search_on'] = False
         return render_template('jobs/edit_job.html', job=job, filaments=filaments, projects=projects, view=view)
 
 
@@ -146,13 +140,8 @@ def search():
         offset = counter
         start = 0
 
-        view = {
-            "title": "Job List",
-            "icon": "fa-archive",
-            "name": "jobs",
-            "nav_on": True,
-            "search_on": True
-        }
+        view['title'] = "Edit jobs"
+        view['search_on'] = True
 
         search = False
         q = request.args.get('q')

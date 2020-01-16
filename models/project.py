@@ -50,8 +50,8 @@ class Project:
         return cls.find_one_by("_id", _id)
 
     @classmethod
-    def all(cls):
-        return [cls(**project) for project in Database.find("projects", {})]
+    def all(cls,  skip=0, limit=0):
+        return [cls(**project) for project in Database.find("projects", {}).sort("name").skip(skip).limit(limit)]
 
     @classmethod
     def get_by_search(cls, parameter):
