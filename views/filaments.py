@@ -1,13 +1,41 @@
 from flask import Blueprint, request, render_template, make_response, redirect, url_for
+from flask_paginate import Pagination, get_page_parameter
+
 from models.filament import Filament
 
 filament_blueprints = Blueprint("filaments", __name__)
 
+view = {
+            "title": "Filaments",
+            "icon": "fa-cubes",
+            "name": "filaments",
+            "nav_on": True,
+            "search_on": False
+        }
 
-@filament_blueprints.route('/')
+
+@filament_blueprints.route('/', methods=['GET'])
 def index():
-    filaments = Filament.all()
-    return render_template('filaments/index.html', filaments=filaments)
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+
+    per_page = 6
+    offset = (page - 1) * per_page
+
+    filaments = Filament.all(offset, per_page)
+    counter = len(Filament.all())
+
+    view['title'] = "Filaments"
+    view['search_on'] = True
+
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+
+    pagination = Pagination(page=page, per_page=per_page, css_framework='bootstrap4', offset=offset, total=counter,
+                            search=search, record_name='filaments')
+
+    return render_template('filaments/index.html', filaments=filaments, pagination=pagination, view=view)
 
 
 @filament_blueprints.route('/new', methods=['GET', 'POST'])
@@ -26,7 +54,9 @@ def new_filament():
         Filament(cor, temp, filament_type, provider, cost, quality, stock, weight, name).save_to_mongo()
         return redirect(url_for('filaments.index'))
     else:
-        return render_template('filaments/new_filament.html')
+        view['title'] = "New filament"
+        view['search_on'] = False
+        return render_template('filaments/new_filament.html', view=view)
 
 
 @filament_blueprints.route('/edit/<string:filament_id>', methods=['GET', 'POST'])
@@ -46,7 +76,10 @@ def edit_filament(filament_id):
         filament.save_to_mongo()
         return redirect(url_for('filaments.index'))
     else:
-        return render_template('filaments/edit_filament.html', filament=filament)
+
+        view['title'] = "Edit filament"
+        view['search_on'] = False
+        return render_template('filaments/edit_filament.html', filament=filament, view=view)
 
 
 @filament_blueprints.route('/delete/<string:filament_id>', methods=['GET'])
@@ -55,3 +88,30 @@ def remove_filament(filament_id):
     filament.remove_from_mongo()
 
     return redirect(url_for('filaments.index'))
+
+
+@filament_blueprints.route('/search', methods=['POST'])
+def search():
+    if request.method == 'POST' and request.form['parameter'] != "":
+        parameter = request.form['parameter']
+        filaments = Filament.get_by_search(parameter)
+
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        counter = len(filaments)
+        per_page = counter if counter > 0 else 1
+        offset = counter
+
+        view['title'] = "Filaments"
+        view['search_on'] = True
+
+        search = False
+        q = request.args.get('q')
+        if q:
+            search = True
+
+        pagination = Pagination(page=page, per_page=per_page, css_framework='bootstrap4', offset=offset, total=counter,
+                                search=search, record_name='filaments')
+
+        return render_template('filaments/index.html', filaments=filaments, pagination=pagination, view=view)
+    else:
+        return redirect(url_for('filaments.index'))

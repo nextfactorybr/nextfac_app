@@ -54,5 +54,16 @@ class Filament:
         return cls.find_one_by("_id", _id)
 
     @classmethod
-    def all(cls):
-        return [cls(**filament) for filament in Database.find("filaments", {})]
+    def all(cls,  skip=0, limit=0):
+        return [cls(**filament) for filament in Database.find("filaments", {}).skip(skip).limit(limit)]
+
+    @classmethod
+    def get_by_search(cls, parameter):
+        results = Database.DATABASE[cls.collection].find(
+            {"$or":
+                [
+                    {"provider": {"$regex": parameter, "$options": 'i'}},
+                    {"cor": {"$regex": parameter, "$options": 'i'}}
+                ]
+            })
+        return [cls(**elem) for elem in results]

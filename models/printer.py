@@ -61,7 +61,6 @@ class Printer:
     def heat(printer_id):
         printer = Printer.find_one_by("_id", printer_id)
         con = OctoRest(url=printer.url, apikey=printer.apikey)
-        print("OK")
         if con.state() == 'Operational':
             try:
                 con.tool_target(215)

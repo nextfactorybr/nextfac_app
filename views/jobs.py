@@ -11,10 +11,17 @@ from models.shift import Shift
 
 job_blueprints = Blueprint("jobs", __name__)
 
+view = {
+        "title": "Job List",
+        "icon": "fa-archive",
+        "name": "jobs",
+        "nav_on": True,
+        "search_on": False
+    }
+
 
 @job_blueprints.route('/', methods=['GET'])
 def index():
-
     counter = Job.jobs_amount()
     jobs = Job.all()
 
@@ -22,18 +29,22 @@ def index():
 
     per_page = 6
     offset = 3 * page
-    start = (page-1)*3
+    start = (page - 1) * 3
+
 
     search = False
     q = request.args.get('q')
     if q:
         search = True
 
+    view['title'] = "Jobs"
+    view['search_on'] = True
+
     pagination = Pagination(page=page, per_page=per_page, css_framework='bootstrap4', offset=offset, total=counter,
                             search=search, record_name='jobs')
 
     return render_template('jobs/index.html', jobs=jobs, now=datetime.today().strftime('%Y-%m-%d'),
-                           pagination=pagination, offset=offset, start=start)
+                           pagination=pagination, offset=offset, start=start, view=view)
 
 
 @job_blueprints.route('/new', methods=['GET', 'POST'])
@@ -71,13 +82,17 @@ def new_job():
 
         return redirect(url_for('jobs.index'))
     else:
+
+        view['title'] = "New jobs"
+        view['search_on'] = False
+
         shifts = Shift.all()
         printers = Printer.all()
         projects = Project.all()
         filaments = Filament.all()
         latest_jobs = Job.get_latest_jobs()
         return render_template('jobs/new_job.html', shifts=shifts, printers=printers, projects=projects,
-                               filaments=filaments, latest_jobs=latest_jobs)
+                               filaments=filaments, latest_jobs=latest_jobs, view=view)
 
 
 @job_blueprints.route('/edit/<string:job_id>', methods=['GET', 'POST'])
@@ -97,7 +112,9 @@ def edit_job(job_id):
         return redirect(url_for('jobs.index'))
 
     else:
-        return render_template('jobs/edit_job.html', job=job, filaments=filaments, projects=projects)
+        view['title'] = "Edit jobs"
+        view['search_on'] = False
+        return render_template('jobs/edit_job.html', job=job, filaments=filaments, projects=projects, view=view)
 
 
 @job_blueprints.route('/delete/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])
@@ -107,6 +124,37 @@ def remove_job(date, shift_id):
         job.remove_from_mongo()
 
     return redirect(url_for('jobs.index'))
+
+
+@job_blueprints.route('/search', methods=['POST'])
+def search():
+    if request.method == 'POST' and request.form['parameter'] != "":
+        parameter = request.form['parameter']
+        jobs = Job.get_by_search(parameter)
+
+        counter = Job.search_amount(parameter)
+
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+
+        per_page = counter if counter > 0 else 1
+        offset = counter
+        start = 0
+
+        view['title'] = "Edit jobs"
+        view['search_on'] = True
+
+        search = False
+        q = request.args.get('q')
+        if q:
+            search = True
+
+        pagination = Pagination(page=page, per_page=per_page, css_framework='bootstrap4', offset=offset, total=counter,
+                                search=search, record_name='jobs')
+
+        return render_template('jobs/index.html', jobs=jobs, now=datetime.today().strftime('%Y-%m-%d'),
+                               pagination=pagination, offset=offset, start=start, view=view)
+    else:
+        return redirect(url_for('jobs.index'))
 
 
 @job_blueprints.route('/heat/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])
@@ -129,7 +177,7 @@ def start_jobs(date, shift_id):
 @job_blueprints.route('/start_one/job_id=<string:job_id>', methods=['GET'])
 def start_one(job_id):
     if Job.start_one(job_id):
-        return True #return tem que ser um redirect
+        return True  # return tem que ser um redirect
 
 
 @job_blueprints.route('/connectall/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])
