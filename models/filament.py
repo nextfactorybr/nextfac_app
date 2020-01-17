@@ -55,7 +55,7 @@ class Filament:
 
     @classmethod
     def all(cls,  skip=0, limit=0):
-        return [cls(**filament) for filament in Database.find("filaments", {}).skip(skip).limit(limit)]
+        return [cls(**filament) for filament in Database.find("filaments", {}).sort("name").skip(skip).limit(limit)]
 
     @classmethod
     def get_by_search(cls, parameter):

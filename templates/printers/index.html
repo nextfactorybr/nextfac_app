@@ -1,8 +1,5 @@
 {% extends "base.html" %}
 {% block  content%}
-<div class="content container mt-3">
-    <header><h3><i class="fa fa-print" aria-hidden="true"></i> Printer List:</h3></header>
-    <hr>
     <section>
         <div class="list-group list-group-flush mb-3">
            {% for printer in printers | sort(attribute='name') %}
@@ -18,6 +15,7 @@
             {% endfor %}
         </div>
         <a class="btn btn-primary" href="{{url_for('printers.new_printer')}}"> Create New </a>
+        <span class="pull-right">{{ pagination.links }}</span>
     </section>
 </div>
 <script type="text/javascript">

@@ -42,8 +42,8 @@ class Printer:
         return cls.find_one_by("_id", _id)
 
     @classmethod
-    def all(cls):
-        return [cls(**printer) for printer in Database.find("printers", {})]
+    def all(cls, skip=0, limit=0):
+        return [cls(**printer) for printer in Database.find("printers", {}).sort("name").skip(skip).limit(limit)]
 
     @staticmethod
     def connect(printer_id):
@@ -67,3 +67,14 @@ class Printer:
                 return True
             except Exception as e:
                 raise TypeError(e)
+
+    @classmethod
+    def get_by_search(cls, parameter):
+        results = Database.DATABASE[cls.collection].find(
+            {"$or":
+                [
+                    {"name": {"$regex": parameter, "$options": 'i'}},
+                    {"url": {"$regex": parameter, "$options": 'i'}}
+                ]
+            })
+        return [cls(**elem) for elem in results]

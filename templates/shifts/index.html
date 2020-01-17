@@ -1,8 +1,5 @@
 {% extends "base.html" %}
 {% block  content%}
-<div class="content container mt-3">
-    <header><h3><i class="fa fa-clock-o" aria-hidden="true"></i> Shift List:</h3></header>
-    <hr>
     <section>
         <div class="list-group list-group-flush mb-3">
            {% for shift in shifts | sort(attribute='timein') %}
@@ -17,6 +14,7 @@
             {% endfor %}
         </div>
         <a class="btn btn-primary" href="{{url_for('shifts.new_shift')}}"> Create New </a>
+        <span class="pull-right">{{ pagination.links }}</span>
     </section>
 </div>
 <script type="text/javascript">

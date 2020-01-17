@@ -42,5 +42,15 @@ class Shift:
         return cls.find_one_by("_id", _id)
 
     @classmethod
-    def all(cls):
-        return [cls(**shift) for shift in Database.find("shifts", {})]
+    def all(cls, skip=0, limit=0):
+        return [cls(**shift) for shift in Database.find("shifts", {}).sort("desc").skip(skip).limit(limit)]
+
+    @classmethod
+    def get_by_search(cls, parameter):
+        results = Database.DATABASE[cls.collection].find(
+            {"$or":
+                [
+                    {"desc": {"$regex": parameter, "$options": 'i'}}
+                ]
+            })
+        return [cls(**elem) for elem in results]
