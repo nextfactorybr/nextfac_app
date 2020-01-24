@@ -25,46 +25,59 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
 </head>
 <body>
-<div class="content container">
-<div class="content container mt-3">
-{% if view is defined and view.nav_on == True %}
-<!--Navbar-->
-<div class="pos-f-t">
-    <!--Menu-->
-    <div class="collapse" id="navbarToggleExternalContent">
-        <div class="bg-dark p-4">
-            <img class="pr-4 border-right" src="{{ static('images/logo_white.png', pdf=False) }}" height="55px">
-            <a class="btn btn-outline-light btn-lg ml-3" href="/jobs/"><i class="fa fa-archive"></i></a>
-            <a class="btn btn-outline-light btn-lg ml-1" href="/shifts/"><i class="fa fa-clock-o"></i></a>
-            <a class="btn btn-outline-light btn-lg ml-1" href="/printers/"><i class="fa fa-print"></i></a>
-            <a class="btn btn-outline-light btn-lg ml-1" href="/projects/"><i class="fa fa-file-code-o"></i></a>
-            <a class="btn btn-outline-light btn-lg ml-1" href="/filaments/"><i class="fa fa-cube"></i></a>
-            <a class="btn btn-outline-light btn-lg ml-1" href=""><i class="fa fa-cog"></i></a>
-        </div>
-    </div>
-    <!--/.Menu-->
-    <nav class="navbar navbar-light bg-light">
-     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon btn-sm"></span>
-    </button>
-    <a class="navbar-brand"><i class="fa {{view.icon}}" aria-hidden="true"></i> {{view.title}}</a>
-    {% if view.search_on %}
-    <span class="text-right">{{ pagination.info }}</span>
-    <!-- Search form -->
-    <form action="/{{view.name}}/search" method="post" class="form-inline">
-    <input name="parameter" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-    <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
-    </form>
+<div class="content container mt-3 mb-3 col-lg-8 col-md-12 col-sm-12">
+{% with messages = get_flashed_messages(with_categories=true)  %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{category}} container col-md-10" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
     {% endif %}
-    </nav>
-<!--/.Navbar-->
-<hr>
+{% endwith %}
+{% if view is defined and view.nav_on == True %}
+    <!--Navbar-->
+    <div class="pos-f-t">
+        <!--Menu-->
+        <div class="collapse" id="navbarToggleExternalContent">
+            <div class="bg-dark p-4 m-0 row">
+                <section class="menu_items col-md-8">
+                <a href="/"><img class="pr-4 border-right" src="{{ static('images/logo_white.png') }}" height="55px"></a>
+                <a class="btn btn-outline-light btn-lg ml-3" href="/jobs/"><i class="fa fa-archive"></i></a>
+                <a class="btn btn-outline-light btn-lg ml-1" href="/shifts/"><i class="fa fa-clock-o"></i></a>
+                <a class="btn btn-outline-light btn-lg ml-1" href="/printers/"><i class="fa fa-print"></i></a>
+                <a class="btn btn-outline-light btn-lg ml-1" href="/projects/"><i class="fa fa-file-code-o"></i></a>
+                <a class="btn btn-outline-light btn-lg ml-1" href="/filaments/"><i class="fa fa-cube"></i></a>
+                <a class="btn btn-outline-light btn-lg ml-1" href="/auth/"><i class="fa fa-cog"></i></a>
+                </section>
+                <section class="user_info col-md-4">
+                    <p class="text-white mt-3 text-right">Hi, {{ session['name'] }} | <a href="{{ url_for('auth.logout') }}"><i class="fa fa-sign-out text-white"> Logout</i></a></p>
+                </section>
+            </div>
+        </div>
+        <!--/.Menu-->
+        <nav class="navbar navbar-light bg-light">
+         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon btn-sm"></span>
+        </button>
+        <a class="navbar-brand"><i class="fa {{view.icon}}" aria-hidden="true"></i> {{view.title}}</a>
+        {% if view.search_on %}
+            <span class="text-right">{{ pagination.info }}</span>
+            <!-- Search form -->
+            <form action="/{{view.name}}/search" method="post" class="form-inline">
+            <input name="parameter" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
+            </form>
+        {% endif %}
+        </nav>
+    <!--/.Navbar-->
+    <hr>
 {% endif %}
 
 {% block content %}
 
 {% endblock content%}
-<br/><br/>
+</div>
 </div>
    <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

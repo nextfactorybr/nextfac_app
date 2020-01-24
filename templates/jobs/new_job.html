@@ -66,9 +66,8 @@
                                  {% else %}
                                     <option value="" selected>Choose..</option>
                                  {% endif %}
-                                  </option>
                                   {% for filament in filaments | sort(attribute='cor')  %}
-                                  <option value="{{filament._id}}">{{filament.name}}</option>
+                                     <option value="{{filament._id}}">{{filament.name}}</option>
                                   {% endfor %}
                                 </select>
                             </div>
@@ -139,5 +138,4 @@
   })
 
     </script>
-</div>
 {% endblock %}

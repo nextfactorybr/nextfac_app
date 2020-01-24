@@ -8,6 +8,7 @@ from models.job import Job
 from models.printer import Printer
 from models.project import Project
 from models.shift import Shift
+from models.user.decorators import requires_login, requires_admin
 
 job_blueprints = Blueprint("jobs", __name__)
 
@@ -21,6 +22,7 @@ view = {
 
 
 @job_blueprints.route('/', methods=['GET'])
+@requires_login
 def index():
     counter = Job.jobs_amount()
     jobs = Job.all()
@@ -48,6 +50,7 @@ def index():
 
 
 @job_blueprints.route('/new', methods=['GET', 'POST'])
+@requires_login
 def new_job():
     if request.method == 'POST':
         orders = request.form.getlist('order_id[]')
@@ -96,6 +99,7 @@ def new_job():
 
 
 @job_blueprints.route('/edit/<string:job_id>', methods=['GET', 'POST'])
+@requires_login
 def edit_job(job_id):
     job = Job.get_by_id(job_id)
     filaments = Filament.all()
@@ -118,6 +122,7 @@ def edit_job(job_id):
 
 
 @job_blueprints.route('/delete/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])
+@requires_login
 def remove_job(date, shift_id):
     jobs = Job.find_many_by_date_shift(date, shift_id)
     for job in jobs:
@@ -127,6 +132,7 @@ def remove_job(date, shift_id):
 
 
 @job_blueprints.route('/search', methods=['POST'])
+@requires_login
 def search():
     if request.method == 'POST' and request.form['parameter'] != "":
         parameter = request.form['parameter']
@@ -158,6 +164,7 @@ def search():
 
 
 @job_blueprints.route('/heat/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])
+@requires_login
 def heat_printers(date, shift_id):
     jobs = Job.find_many_by_date_shift(date, shift_id)
     for job in jobs:
@@ -167,6 +174,7 @@ def heat_printers(date, shift_id):
 
 
 @job_blueprints.route('/start/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])
+@requires_login
 def start_jobs(date, shift_id):
     status = Job.start_all(date, shift_id)
     # status has [empty] if all printers are ok or an [array] whit the printers and error messages for passing to modal
@@ -175,12 +183,14 @@ def start_jobs(date, shift_id):
 
 
 @job_blueprints.route('/start_one/job_id=<string:job_id>', methods=['GET'])
+@requires_login
 def start_one(job_id):
     if Job.start_one(job_id):
         return True  # return tem que ser um redirect
 
 
 @job_blueprints.route('/connectall/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])
+@requires_login
 def connect_all(date, shift_id):
     status = Job.connect_all(date, shift_id)
     # status has [empty] if all printers are ok or an [array] whit the printers and error messages for passing to modal
@@ -189,6 +199,7 @@ def connect_all(date, shift_id):
 
 
 @job_blueprints.route('/print_jobs/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])
+@requires_login
 def print_jobs(date, shift_id):
     jobs = Job.find_many_by_date_shift(date, shift_id)
     rendered = render_template('jobs/print.html', jobs=jobs)

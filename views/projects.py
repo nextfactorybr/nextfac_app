@@ -2,6 +2,7 @@ from flask import Blueprint, request, render_template, make_response, redirect, 
 from flask_paginate import Pagination, get_page_parameter
 from models.project import Project
 from models.shift import Shift
+from models.user.decorators import requires_login, requires_admin
 
 project_blueprints = Blueprint("projects", __name__)
 
@@ -15,6 +16,7 @@ view = {
 
 
 @project_blueprints.route('/', methods=['GET'])
+@requires_login
 def index():
     page = request.args.get(get_page_parameter(), type=int, default=1)
 
@@ -39,6 +41,7 @@ def index():
 
 
 @project_blueprints.route('/search', methods=['POST'])
+@requires_login
 def search():
     if request.method == 'POST' and request.form['parameter'] != "":
         parameter = request.form['parameter']
@@ -66,6 +69,7 @@ def search():
 
 
 @project_blueprints.route('/new', methods=['GET', 'POST'])
+@requires_login
 def new_project():
     if request.method == 'POST':
         name = request.form['name']
@@ -84,6 +88,7 @@ def new_project():
 
 
 @project_blueprints.route('/edit/<string:project_id>', methods=['GET', 'POST'])
+@requires_login
 def edit_project(project_id):
     project = Project.get_by_id(project_id)
 
@@ -103,6 +108,7 @@ def edit_project(project_id):
 
 
 @project_blueprints.route('/delete/<string:project_id>', methods=['GET'])
+@requires_login
 def remove_project(project_id):
     project = Project.get_by_id(project_id)
     project.remove_from_mongo()

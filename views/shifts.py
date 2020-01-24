@@ -1,6 +1,7 @@
 from flask import Blueprint, request, render_template, make_response, redirect, url_for
 from flask_paginate import Pagination, get_page_parameter
 from models.shift import Shift
+from models.user.decorators import requires_login, requires_admin
 
 shift_blueprints = Blueprint("shifts", __name__)
 
@@ -14,6 +15,7 @@ view = {
 
 
 @shift_blueprints.route('/')
+@requires_login
 def index():
     page = request.args.get(get_page_parameter(), type=int, default=1)
 
@@ -38,6 +40,7 @@ def index():
 
 
 @shift_blueprints.route('/new', methods=['GET', 'POST'])
+@requires_login
 def new_shift():
     if request.method == 'POST':
         desc = request.form['desc']
@@ -53,6 +56,7 @@ def new_shift():
 
 
 @shift_blueprints.route('/edit/<string:shift_id>', methods=['GET', 'POST'])
+@requires_login
 def edit_shift(shift_id):
     shift = Shift.get_by_id(shift_id)
 
@@ -70,6 +74,7 @@ def edit_shift(shift_id):
 
 
 @shift_blueprints.route('/delete/<string:shift_id>', methods=['GET'])
+@requires_login
 def remove_shift(shift_id):
     shift = Shift.get_by_id(shift_id)
     shift.remove_from_mongo()
@@ -78,6 +83,7 @@ def remove_shift(shift_id):
 
 
 @shift_blueprints.route('/search', methods=['POST'])
+@requires_login
 def search():
     if request.method == 'POST' and request.form['parameter'] != "":
         parameter = request.form['parameter']

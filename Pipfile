@@ -17,6 +17,8 @@ pdfkit = "*"
 xhtml2pdf = "*"
 fpdf = "*"
 flask-paginate = "*"
+passlib = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.7"

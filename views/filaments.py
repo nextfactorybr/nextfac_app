@@ -2,6 +2,7 @@ from flask import Blueprint, request, render_template, make_response, redirect, 
 from flask_paginate import Pagination, get_page_parameter
 
 from models.filament import Filament
+from models.user.decorators import requires_login, requires_admin
 
 filament_blueprints = Blueprint("filaments", __name__)
 
@@ -15,6 +16,7 @@ view = {
 
 
 @filament_blueprints.route('/', methods=['GET'])
+@requires_login
 def index():
     page = request.args.get(get_page_parameter(), type=int, default=1)
 
@@ -39,6 +41,7 @@ def index():
 
 
 @filament_blueprints.route('/new', methods=['GET', 'POST'])
+@requires_login
 def new_filament():
     if request.method == 'POST':
         cor = request.form['cor']
@@ -60,6 +63,7 @@ def new_filament():
 
 
 @filament_blueprints.route('/edit/<string:filament_id>', methods=['GET', 'POST'])
+@requires_login
 def edit_filament(filament_id):
     filament = Filament.get_by_id(filament_id)
 
@@ -83,6 +87,7 @@ def edit_filament(filament_id):
 
 
 @filament_blueprints.route('/delete/<string:filament_id>', methods=['GET'])
+@requires_login
 def remove_filament(filament_id):
     filament = Filament.get_by_id(filament_id)
     filament.remove_from_mongo()
@@ -91,6 +96,7 @@ def remove_filament(filament_id):
 
 
 @filament_blueprints.route('/search', methods=['POST'])
+@requires_login
 def search():
     if request.method == 'POST' and request.form['parameter'] != "":
         parameter = request.form['parameter']

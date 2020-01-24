@@ -1,6 +1,7 @@
 from flask import Blueprint, request, render_template, make_response, redirect, url_for
 from flask_paginate import Pagination, get_page_parameter
 from models.printer import Printer
+from models.user.decorators import requires_login, requires_admin
 
 printer_blueprints = Blueprint("printers", __name__)
 
@@ -14,6 +15,7 @@ view = {
 
 
 @printer_blueprints.route('/')
+@requires_login
 def index():
     page = request.args.get(get_page_parameter(), type=int, default=1)
 
@@ -38,6 +40,7 @@ def index():
 
 
 @printer_blueprints.route('/new', methods=['GET', 'POST'])
+@requires_login
 def new_printer():
     if request.method == 'POST':
         name = request.form['name']
@@ -53,6 +56,7 @@ def new_printer():
 
 
 @printer_blueprints.route('/edit/<string:printer_id>', methods=['GET', 'POST'])
+@requires_login
 def edit_printer(printer_id):
     printer = Printer.get_by_id(printer_id)
 
@@ -70,6 +74,7 @@ def edit_printer(printer_id):
 
 
 @printer_blueprints.route('/delete/<string:printer_id>', methods=['GET'])
+@requires_login
 def remove_printer(printer_id):
     printer = Printer.get_by_id(printer_id)
     printer.remove_from_mongo()
@@ -78,6 +83,7 @@ def remove_printer(printer_id):
 
 
 @printer_blueprints.route('/search', methods=['POST'])
+@requires_login
 def search():
     if request.method == 'POST' and request.form['parameter'] != "":
         parameter = request.form['parameter']
