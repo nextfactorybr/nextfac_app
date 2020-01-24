@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template
+from flask import Flask, render_template, session, redirect, url_for, flash
 
 from models import helpers
 from views.jobs import job_blueprints
@@ -19,6 +19,10 @@ app.config.update(
 
 @app.route('/')
 def home():
+    if 'email' in session:
+        if session['email'] is not None:
+            return redirect(url_for('jobs.index'))
+
     return render_template('home.html')
 
 

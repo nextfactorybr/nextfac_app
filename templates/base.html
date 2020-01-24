@@ -41,7 +41,7 @@
         <!--Menu-->
         <div class="collapse" id="navbarToggleExternalContent">
             <div class="bg-dark p-4 m-0 row">
-                <section class="menu_items col-md-8">
+                <section class="menu_items col-lg-8 col-md-12 text-left">
                 <a href="/"><img class="pr-4 border-right" src="{{ static('images/logo_white.png') }}" height="55px"></a>
                 <a class="btn btn-outline-light btn-lg ml-3" href="/jobs/"><i class="fa fa-archive"></i></a>
                 <a class="btn btn-outline-light btn-lg ml-1" href="/shifts/"><i class="fa fa-clock-o"></i></a>
@@ -50,7 +50,7 @@
                 <a class="btn btn-outline-light btn-lg ml-1" href="/filaments/"><i class="fa fa-cube"></i></a>
                 <a class="btn btn-outline-light btn-lg ml-1" href="/auth/"><i class="fa fa-cog"></i></a>
                 </section>
-                <section class="user_info col-md-4">
+                <section class="user_info col-lg-4 col-md-12">
                     <p class="text-white mt-3 text-right">Hi, {{ session['name'] }} | <a href="{{ url_for('auth.logout') }}"><i class="fa fa-sign-out text-white"> Logout</i></a></p>
                 </section>
             </div>

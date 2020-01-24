@@ -57,7 +57,7 @@ def login_user():
             Utils.make_session_permanent(remember_me)
             return redirect(url_for('jobs.index'))
         except UserErrors.UserError as e:
-            return e.message
+            flash(e.message, 'warning')
 
     return render_template("home.html")
 
