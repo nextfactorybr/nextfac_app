@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, make_response, redirect, url_for
+from flask import Blueprint, request, render_template, make_response, redirect, url_for, flash, Markup
 from flask_paginate import Pagination, get_page_parameter
 from models.printer import Printer
 from models.user.decorators import requires_login, requires_admin
@@ -47,8 +47,16 @@ def new_printer():
         url = request.form['url']
         apikey = request.form['apikey']
 
-        Printer(name, url, apikey).save_to_mongo()
-        return redirect(url_for('printers.index'))
+        if Printer.find_one_by("name", name) or Printer.find_one_by("url", url):
+            message = Markup('<i class="fa fa-warning"></i> Error: The printer/url you are trying to create already exist.')
+            flash(message, 'warning')
+            view['title'] = "New Printer"
+            view['search_on'] = False
+            return render_template('printers/new_printer.html', view=view)
+        else:
+            Printer(name, url, apikey).save_to_mongo()
+            flash('The printer was successfully created!', 'success')
+            return redirect(url_for('printers.index'))
     else:
         view['title'] = "New printer"
         view['search_on'] = False
@@ -65,7 +73,17 @@ def edit_printer(printer_id):
         printer.url = request.form['url']
         printer.apikey = request.form['apikey']
 
+        x_printer = Printer.find_one_by("url", printer.url)
+        if x_printer is not None:
+            if x_printer._id != printer_id:
+                message = Markup('<i class="fa fa-warning"></i> Error: The printer cannot be created, already exist.')
+                flash(message, 'warning')
+                view['title'] = "Edit printer"
+                view['search_on'] = False
+                return render_template('printers/edit_printer.html', printer=printer, view=view)
+
         printer.save_to_mongo()
+        flash('The printer was updated!', 'success')
         return redirect(url_for('printers.index'))
     else:
         view['title'] = "Edit printer"
@@ -78,7 +96,7 @@ def edit_printer(printer_id):
 def remove_printer(printer_id):
     printer = Printer.get_by_id(printer_id)
     printer.remove_from_mongo()
-
+    flash('The printer was deleted!', 'danger')
     return redirect(url_for('printers.index'))
 
 

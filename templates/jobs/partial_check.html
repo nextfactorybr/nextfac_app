@@ -12,7 +12,7 @@
           <tbody>
              {% for job in status %}
                 <tr class="border-bottom">
-                  <td><i class="fa fa-print"></i> {{job[0].printer_name}}</td>
+                  <td><a href="{{job[0].printer_url}}" target="_blank" class="text-black"><i class="fa fa-print"></i> {{job[0].printer_name}}</a></td>
                   <td>{{job[0].job_name}}</td>
                   <td>{{job[0].error}}</td>
                   {% if job[0].error == "File not found!" %}

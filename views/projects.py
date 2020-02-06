@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, make_response, redirect, url_for
+from flask import Blueprint, request, render_template, make_response, redirect, url_for, flash, Markup
 from flask_paginate import Pagination, get_page_parameter
 from models.project import Project
 from models.shift import Shift
@@ -78,8 +78,17 @@ def new_project():
         shift_id = request.form['shift_id']
         path = request.form['path']
 
-        Project(name, time, weight, shift_id, path).save_to_mongo()
-        return redirect(url_for('projects.index'))
+        if Project.find_one_by("name", name):
+            message = Markup('<i class="fa fa-warning"></i> Error: The project you are trying to create already exist.')
+            flash(message, 'warning')
+            view['title'] = "New project"
+            view['search_on'] = False
+            shifts = Shift.all()
+            return render_template('projects/new_project.html', shifts=shifts, view=view)
+        else:
+            Project(name, time, weight, shift_id, path).save_to_mongo()
+            flash('The project was successfully created!', 'success')
+            return redirect(url_for('projects.index'))
     else:
         view['title'] = "New project"
         view['search_on'] = False
@@ -99,7 +108,17 @@ def edit_project(project_id):
         project.shift_id = request.form['shift_id']
         project.path = request.form['path']
 
+        x_project = Project.find_one_by("name", project.name)
+        if x_project is not None:
+            if x_project._id != project_id:
+                message = Markup('<i class="fa fa-warning"></i> Error: The project cannot be created, already exist.')
+                flash(message, 'warning')
+                view['title'] = "Edit project"
+                view['search_on'] = False
+                return render_template('projects/edit_project.html', project=project, view=view)
+
         project.save_to_mongo()
+        flash('The project was updated!', 'success')
         return redirect(url_for('projects.index'))
     else:
         view['title'] = "Edit project"
@@ -112,5 +131,5 @@ def edit_project(project_id):
 def remove_project(project_id):
     project = Project.get_by_id(project_id)
     project.remove_from_mongo()
-
+    flash('The project was deleted!', 'danger')
     return redirect(url_for('projects.index'))

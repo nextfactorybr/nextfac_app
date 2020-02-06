@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, make_response, redirect, url_for, jsonify, session, flash
+from flask import Blueprint, request, render_template, make_response, redirect, url_for, jsonify, session, flash, Markup
 from models.user import User, UserErrors
 from models.user import requires_login, requires_admin
 from common.utils import Utils
@@ -32,8 +32,9 @@ def register_user():
         group_id = request.form['group_id']
 
         try:
+            message = Markup('<i class="fa fa-check"></i> User was successfully created!')
             User.register_user(email, password, name, area, group_id)
-            flash('User was successfully created!', 'success')
+            flash(message, 'success')
             return redirect(url_for('auth.index'))
         except UserErrors.UserError as e:
             return e.message
@@ -57,7 +58,8 @@ def login_user():
             Utils.make_session_permanent(remember_me)
             return redirect(url_for('jobs.index'))
         except UserErrors.UserError as e:
-            flash(e.message, 'warning')
+            message = Markup('<i class="fa fa-warning"></i> ' + e.message)
+            flash(message, 'warning')
 
     return render_template("home.html")
 

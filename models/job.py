@@ -97,11 +97,13 @@ class Job:
 
     @classmethod
     def find_one_by(cls, attribute, value):
-        return cls(**Database.find_one(cls.collection, {attribute: value}))
+        result = Database.find_one(cls.collection, {attribute: value})
+        return cls(**result) if result else None
 
     @classmethod
     def find_many_by(cls, attribute, value):
-        return [cls(**elem) for elem in Database.find(cls.collection, {attribute: value})]
+        result = Database.find(cls.collection, {attribute: value})
+        return [cls(**elem) for elem in result] if result else None
 
     @classmethod
     def get_by_id(cls, _id):
@@ -109,11 +111,13 @@ class Job:
 
     @classmethod
     def find_many_by_date_shift(cls, date, shift_id):
-        return [cls(**elem) for elem in Database.find(cls.collection, {'date': date, 'shift_id': shift_id})]
+        result = Database.find(cls.collection, {'date': date, 'shift_id': shift_id})
+        return [cls(**elem) for elem in result] if result else None
 
     @classmethod
     def all(cls):
-        return [cls(**job) for job in Database.find("jobs", {})]
+        result = Database.find("jobs", {})
+        return [cls(**job) for job in result] if result else None
 
     @classmethod
     def groupby(cls):
@@ -196,7 +200,7 @@ class Job:
                         disconnected_list.append([{"job_date": job.date, "job_shift": job.shift_id, "job_id": job._id,
                                                    "project_id": job.project_id, "job_name": job.project.name,
                                                    "printer_id": job.printer_id, "printer_name": job.printer.name,
-                                                   "error": e.args[0]}])
+                                                   "printer_url": job.printer.url, "error": e.args[0]}])
         return disconnected_list
 
     @staticmethod
@@ -212,12 +216,12 @@ class Job:
                         disconnected_list.append([{"job_date": job.date, "job_shift": job.shift_id, "job_id": job._id,
                                                    "project_id": job.project_id, "job_name": job.project.name,
                                                    "printer_id": job.printer_id, "printer_name": job.printer.name,
-                                                   "error": con.state()}])
+                                                   "printer_url": job.printer.url, "error": con.state()}])
                     except Exception as e:
                         disconnected_list.append([{"job_date": job.date, "job_shift": job.shift_id, "job_id": job._id,
                                                    "project_id": job.project_id, "job_name": job.project.name,
                                                    "printer_id": job.printer_id, "printer_name": job.printer.name,
-                                                   "error": e.args[0]}])
+                                                   "printer_url": job.printer.url, "error": e.args[0]}])
         return disconnected_list
 
     @staticmethod
@@ -261,7 +265,7 @@ class Job:
 
     @classmethod
     def get_by_search(cls, parameter):
-        results = Database.DATABASE[cls.collection].find(
+        result = Database.DATABASE[cls.collection].find(
             {"$or":
                 [
                     {"date": {"$regex": parameter, "$options": 'i'}},
@@ -269,7 +273,7 @@ class Job:
                 ]
             })
 
-        return [cls(**elem) for elem in results]
+        return [cls(**elem) for elem in result] if result else None
 
     @classmethod
     def search_amount(cls, parameter):

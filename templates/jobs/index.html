@@ -41,7 +41,7 @@
                         </div>
                         <div id='collapse{{grouper}}{{grouper2}}' class="collapse mb-2" aria-labelledby='heading{{job.date}}{{job.shift_id}}' data-parent="#accordion">
                           <div class="card-body">
-                              <table class="table table-bordered">
+                              <table class="table table-bordered table-sm table-hover">
                                   <thead class="thead-dark">
                                     <tr>
                                       <th scope="col">PRINTER</th>
@@ -56,7 +56,11 @@
                                   </thead>
                                   <tbody>
                                     {% for item in items | sort(attribute='printer.name')%}
+                                      {% if item.status %}
                                         <tr>
+                                      {% else %}
+                                        <tr class="bg-inactive">
+                                      {% endif %}
                                           <th scope="row">{{item.printer.name}}</th>
                                           <td>{{item.order_id}}</td>
                                           <td>{{item.project.name}}</td>

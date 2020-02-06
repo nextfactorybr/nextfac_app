@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, make_response, redirect, url_for
+from flask import Blueprint, request, render_template, make_response, redirect, url_for, flash, Markup
 from flask_paginate import Pagination, get_page_parameter
 from models.shift import Shift
 from models.user.decorators import requires_login, requires_admin
@@ -47,8 +47,16 @@ def new_shift():
         timein = request.form['timein']
         timeout = request.form['timeout']
 
-        Shift(desc, timein, timeout).save_to_mongo()
-        return redirect(url_for('shifts.index'))
+        if Shift.find_one_by("desc", desc):
+            message = Markup('<i class="fa fa-warning"></i> Error: The shift you are trying to create already exist.')
+            flash(message, 'warning')
+            view['title'] = "New Shift"
+            view['search_on'] = False
+            return render_template('shifts/new_shift.html', view=view)
+        else:
+            Shift(desc, timein, timeout).save_to_mongo()
+            flash('The printer was successfully created!', 'success')
+            return redirect(url_for('shifts.index'))
     else:
         view['title'] = "New shift"
         view['search_on'] = False
@@ -65,7 +73,17 @@ def edit_shift(shift_id):
         shift.timein = request.form['timein']
         shift.timeout = request.form['timeout']
 
+        x_shift = Shift.find_one_by("desc", shift.desc)
+        if x_shift is not None:
+            if x_shift._id != shift_id:
+                message = Markup('<i class="fa fa-warning"></i> Error: The shift cannot be created, already exist.')
+                flash(message, 'warning')
+                view['title'] = "Edit shift"
+                view['search_on'] = False
+                return render_template('shifts/edit_shift.html', shift=shift, view=view)
+
         shift.save_to_mongo()
+        flash('The shift was updated!', 'success')
         return redirect(url_for('shifts.index'))
     else:
         view['title'] = "Edit shift"
@@ -78,7 +96,7 @@ def edit_shift(shift_id):
 def remove_shift(shift_id):
     shift = Shift.get_by_id(shift_id)
     shift.remove_from_mongo()
-
+    flash('The shift was deleted!', 'danger')
     return redirect(url_for('shifts.index'))
 
 

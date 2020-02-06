@@ -27,25 +27,26 @@
                 <div class="list-group list-group-flush mb-3">
                     <table class="table">
                       <thead class="thead-dark">
-                        <tr>
+                        <tr class="text-center">
                           <th scope="col">Printer</th>
                           <th scope="col">Order_id</th>
                           <th scope="col">Project</th>
                           <th scope="col">Color</th>
+                          <th scope="col"></th>
                           <th scope="col">OBS</th>
                           <th scope="col">Status</th>
                         </tr>
                       </thead>
                       <tbody>
                    {% for printer in printers | sort(attribute='name') %}
-                        <tr>
+                        <tr class="tr-pr{{loop.index}}">
                           <th scope="row">{{ printer.name }}
                           <input class="form-control pr{{loop.index}}" type="text" value="{{printer._id}}" name="printer_id[]" hidden/>
                           </th>
 
                           <td>
                             <div class="form-group input-group col">
-                                <input class="form-control pr{{loop.index}}" type="text" name="order_id[]" placeholder="Order_id" required/>
+                                <input class="form-control pr{{loop.index}} order-id" data-id="pr{{loop.index}}" type="text" name="order_id[]" placeholder="Order_id" required/>
                             </div>
                           </td>
                           <td>
@@ -60,16 +61,25 @@
                           </td>
                           <td>
                                <div class="form-group input-group">
-                                <select class="selectpicker pr{{loop.index}}" data-live-search="true" name="filament_id[]" required>
+                                <select class="selectpicker pr{{loop.index}} filament" data-live-search="true" data-id="pr{{loop.index}}" name="filament_id[]" required>
                                  {% if latest_jobs[loop.index0].fromfilaments[0] is defined %}
-                                    <option value="{{latest_jobs[loop.index0].filament_id}}" selected>{{latest_jobs[loop.index0].fromfilaments[0].name}}</option>
+                                    <option value="{{latest_jobs[loop.index0].filament_id}}" data-color="{{latest_jobs[loop.index0].fromfilaments[0].hex_cor}}" selected>{{latest_jobs[loop.index0].fromfilaments[0].name}}</option>
                                  {% else %}
                                     <option value="" selected>Choose..</option>
                                  {% endif %}
                                   {% for filament in filaments | sort(attribute='cor')  %}
-                                     <option value="{{filament._id}}">{{filament.name}}</option>
+                                     <option value="{{filament._id}}" data-color="{{filament.hex_cor}}">{{filament.name}}</option>
                                   {% endfor %}
                                 </select>
+                            </div>
+                          </td>
+                          <td>
+                               <div class="form-group input-group">
+                                {% if latest_jobs[loop.index0].fromfilaments[0] is defined %}
+                                   <div style="background-color: {{ latest_jobs[loop.index0].fromfilaments[0].hex_cor }}" class="color-picker border border-secondary rounded-circle cor-pr{{loop.index}}"></div>
+                                {% else %}
+                                    <div class="color-picker border border-secondary rounded-circle cor-pr{{loop.index}} gradient-circle"></div>
+                                {% endif %}
                             </div>
                           </td>
                           <td>
@@ -127,15 +137,46 @@
         $('.status').change(function() {
          if ($(this).prop('checked')) {
             var id = $(this).attr('data-id');
+            var tr = "tr-" + $(this).attr('data-id');
             $('.'+id).prop( "disabled", false );
             $(this).attr("value", true);
+            $('.'+tr).removeClass("bg-inactive");
          } else {
              var id = $(this).attr('data-id');
+             var tr = "tr-" + $(this).attr('data-id');
              $('.'+id).prop( "disabled", true );
+             $('.'+id).val('');
              $(this).attr("value", false);
+             $('.'+tr).addClass("bg-inactive");
+             $('.'+tr).removeClass("alert-success");
          }
     })
   })
 
+   $(function() {
+        $('.filament').change(function() {
+        var id = $(this).attr('data-id');
+        var picker = "cor-" + id;
+        var cor = $(this).find(":selected").attr('data-color');
+        $('.'+picker).css("background-color", cor);
+        $('.'+picker).removeClass("gradient-circle");
+
+    })
+  })
+
+   $(function() {
+        $('.order-id').change(function() {
+        var id = $(this).attr('data-id');
+        var tr = "tr-" + id;
+         if ($(this).val().length) {
+                $('.'+tr).addClass("alert-success");
+            } else {
+                $('.'+tr).removeClass("alert-success");
+            }
+    })
+  })
+
+
     </script>
+
 {% endblock %}

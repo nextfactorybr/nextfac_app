@@ -39,11 +39,13 @@ class Project:
 
     @classmethod
     def find_one_by(cls, attribute, value):
-        return cls(**Database.find_one(cls.collection, {attribute: value}))
+        result = Database.find_one(cls.collection, {attribute: value})
+        return cls(**result) if result else None
 
     @classmethod
     def find_many_by(cls, attribute, value):
-        return [cls(**elem) for elem in Database.find(cls.collection, {attribute: value})]
+        result = Database.find(cls.collection, {attribute: value})
+        return [cls(**elem) for elem in result] if result else None
 
     @classmethod
     def get_by_id(cls, _id):
@@ -51,15 +53,16 @@ class Project:
 
     @classmethod
     def all(cls,  skip=0, limit=0):
-        return [cls(**project) for project in Database.find("projects", {}).sort("name").skip(skip).limit(limit)]
+        result = Database.find("projects", {}).sort("name").skip(skip).limit(limit)
+        return [cls(**project) for project in result] if result else None
 
     @classmethod
     def get_by_search(cls, parameter):
-        results = Database.DATABASE[cls.collection].find(
+        result = Database.DATABASE[cls.collection].find(
             {"$or":
                 [
                     {"name": {"$regex": parameter, "$options": 'i'}},
                     {"path": {"$regex": parameter, "$options": 'i'}}
                 ]
              })
-        return [cls(**elem) for elem in results]
+        return [cls(**elem) for elem in result] if result else None

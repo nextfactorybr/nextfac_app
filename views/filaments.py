@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, make_response, redirect, url_for
+from flask import Blueprint, request, render_template, make_response, redirect, url_for, flash, Markup
 from flask_paginate import Pagination, get_page_parameter
 
 from models.filament import Filament
@@ -53,9 +53,18 @@ def new_filament():
         stock = request.form['stock']
         weight = request.form['weight']
         name = filament_type + "-" + cor + " " + provider + "-" + weight
+        hex_cor = request.form['hex_cor']
 
-        Filament(cor, temp, filament_type, provider, cost, quality, stock, weight, name).save_to_mongo()
-        return redirect(url_for('filaments.index'))
+        if Filament.find_one_by("name", name):
+            message = Markup('<i class="fa fa-warning"></i> Error: The filament you are trying to create already exist.')
+            flash(message, 'warning')
+            view['title'] = "New filament"
+            view['search_on'] = False
+            return render_template('filaments/new_filament.html', view=view)
+        else:
+            Filament(cor, temp, filament_type, provider, cost, quality, stock, weight, name, hex_cor).save_to_mongo()
+            flash('The filament was successfully created!', 'success')
+            return redirect(url_for('filaments.index'))
     else:
         view['title'] = "New filament"
         view['search_on'] = False
@@ -76,11 +85,21 @@ def edit_filament(filament_id):
         filament.stock = request.form['stock']
         filament.weight = request.form['weight']
         filament.name = filament.filament_type + "-" + filament.cor + " " + filament.provider + "-" + filament.weight
+        filament.hex_cor = request.form['hex_cor']
+
+        x_filament = Filament.find_one_by("name", filament.name)
+        if x_filament is not None:
+            if x_filament._id != filament_id:
+                message = Markup('<i class="fa fa-warning"></i> Error: The filament cannot be created, already exist.')
+                flash(message, 'warning')
+                view['title'] = "Edit filament"
+                view['search_on'] = False
+                return render_template('filaments/edit_filament.html', filament=filament, view=view)
 
         filament.save_to_mongo()
+        flash('The filament was updated!', 'success')
         return redirect(url_for('filaments.index'))
     else:
-
         view['title'] = "Edit filament"
         view['search_on'] = False
         return render_template('filaments/edit_filament.html', filament=filament, view=view)
@@ -91,7 +110,7 @@ def edit_filament(filament_id):
 def remove_filament(filament_id):
     filament = Filament.get_by_id(filament_id)
     filament.remove_from_mongo()
-
+    flash('The filament was deleted!', 'danger')
     return redirect(url_for('filaments.index'))
 
 

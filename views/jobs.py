@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Blueprint, request, render_template, make_response, redirect, url_for, jsonify
+from flask import Blueprint, request, render_template, make_response, redirect, url_for, jsonify, flash, Markup
 from flask_paginate import Pagination, get_page_parameter
 import pdfkit
 
@@ -83,6 +83,7 @@ def new_job():
             if not job.job_exist():
                 job.save_to_mongo()
 
+        flash('The job was created!', 'success')
         return redirect(url_for('jobs.index'))
     else:
 
@@ -112,7 +113,7 @@ def edit_job(job_id):
         job.obs = request.form['obs'] if 'obs' in request.form else ""
         job.status = True if 'project_id' in request.form else False
         job.save_to_mongo()
-
+        flash('The job was updated!', 'success')
         return redirect(url_for('jobs.index'))
 
     else:
@@ -127,7 +128,7 @@ def remove_job(date, shift_id):
     jobs = Job.find_many_by_date_shift(date, shift_id)
     for job in jobs:
         job.remove_from_mongo()
-
+    flash('The job was deleted!', 'danger')
     return redirect(url_for('jobs.index'))
 
 
