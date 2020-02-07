@@ -29,9 +29,9 @@ def index():
 
     page = request.args.get(get_page_parameter(), type=int, default=1)
 
-    per_page = 6
-    offset = 3 * page
-    start = (page - 1) * 3
+    per_page = 8
+    offset = 4 * page
+    start = (page - 1) * 4
 
 
     search = False
@@ -209,3 +209,13 @@ def print_jobs(date, shift_id):
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     return response
+
+
+@job_blueprints.route('/check_availability/date=<string:date>shift_id=<string:shift_id>', methods=['GET'])
+@requires_login
+def check_availability(date, shift_id):
+    job_exist = Job.find_many_by_date_shift(date, shift_id)
+    if len(job_exist) == 0:
+        return jsonify(exist=False)
+    else:
+        return jsonify(exist=True)

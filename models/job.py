@@ -121,7 +121,7 @@ class Job:
 
     @classmethod
     def groupby(cls):
-        results = Database.DATABASE[cls.collection].aggregate(
+        result = Database.DATABASE[cls.collection].aggregate(
             [
                 {"$lookup": {
                     "from": "shifts",
@@ -161,7 +161,7 @@ class Job:
 
                 {"$sort": {"_id.date": -1, "_id.shift": 1}}
             ])
-        return results
+        return result
 
     @classmethod
     def jobs_amount(cls):

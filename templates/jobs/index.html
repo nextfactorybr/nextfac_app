@@ -20,10 +20,12 @@
 
         <div class="list-group list-group-flush mb-3">
           <div id="accordion">
+           {% set count = namespace(value=1) %}
            {% for grouper, job in jobs|groupby('date')|sort(attribute='grouper', reverse = True) %}
               {% set outer_loop = loop %}
                 {% for grouper2, items in job|groupby('shift_id')|sort(reverse = True) %}
-                  {% if outer_loop.index > start and outer_loop.index <= offset %}
+                  {% if outer_loop.index > start and count.value <= pagination.per_page %}
+                    {% set count.value = count.value + 1 %}
                       <div class="card mb-1">
                         <div class="card-header" id='heading{{ job._id }}'>
                           <h5 class="float-left mb-0 col-md-6">

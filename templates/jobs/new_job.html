@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block  content%}
+    <div class="alert alert-warning alert-dismissible fade collapse" role="alert" id="inuse">
+       <button type="button" class="close" aria-label="Close" id="closealert"><span aria-hidden="true">&times;</span></button>
+        <i class="fa fa-warning"></i> There is another job with the same date and shift, please check!
+    </div>
     <section class="add-job-form">
         <form id="new-job" action="/jobs/new" method="post">
             <div class="form-row">
@@ -11,7 +15,7 @@
                 </span>
             </div>
             </div>
-            <div class="form-group input-group col-md-5">
+            <div class="form-group input-group col-md-4">
                 <div class="input-group-prepend">
                     <label class="input-group-text" for="shift_id">Shift</label>
                 </div>
@@ -23,7 +27,12 @@
                 </select>
             </div>
 
-            <section>
+            <div class="form-group input-group col-md-4">
+                <a id="checkbutton" class="btn btn-success text-white"> check availability</a>
+            </div>
+
+
+            <section id="joblist" class="d-none">
                 <div class="list-group list-group-flush mb-3">
                     <table class="table">
                       <thead class="thead-dark">
@@ -100,10 +109,12 @@
             </section>
 
             </div>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button id="savebutton" type="submit" class="btn btn-primary bg-inactive border-0" disabled>Save</button>
             <a class="btn btn-secondary" href="{{url_for('jobs.index')}}"> Cancel </a>
         </form>
     </section>
+
+   <script type="text/javascript" src="{{ url_for('static', filename='js/loading.js') }}"></script>
    <script type="text/javascript">
     var defaults = {
 	calendarWeeks: false,
@@ -176,6 +187,51 @@
     })
   })
 
+  $(function() {
+        $('#checkbutton').click(function() {
+        if ($('#new-job')[0]['date'].reportValidity() && $('#new-job')[0]['shift_id'].reportValidity())
+        {
+            var date = $('#date').val();
+         var shift = $('#shift_id').val();
+             $.ajax({
+              type: 'get',
+              dataType: 'json',
+              cache: false,
+              headers: { "cache-control": "no-cache" },
+              url: '/jobs/check_availability/date='+date+'shift_id='+shift,
+              beforeSend: function () {
+                DarkenPageWithLoading();
+              },
+              success: function (data) {
+                LightenPage();
+                if (data.exist) {
+                    $('#inuse').removeClass('collapse');
+                    $('#inuse').addClass('show');
+                } else {
+                    $('#inuse').addClass('collapse');
+                    $('#inuse').removeClass('show');
+
+                    $('#shift_id').prop( "disabled", true );
+                    $('#date').prop( "disabled", true );
+
+                    $('#savebutton').removeAttr("disabled");
+                    $('#savebutton').removeClass("bg-inactive");
+                    $('#savebutton').removeClass("border-0");
+
+                    $('#joblist').removeClass("d-none");
+                }
+              }
+            });
+        }
+    })
+  })
+
+  $(function() {
+        $('#closealert').click(function() {
+        $('#inuse').addClass('collapse');
+        $('#inuse').removeClass('show');
+    })
+  })
 
     </script>
 
