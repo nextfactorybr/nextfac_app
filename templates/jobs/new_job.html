@@ -211,8 +211,8 @@
                     $('#inuse').addClass('collapse');
                     $('#inuse').removeClass('show');
 
-                    $('#shift_id').prop( "disabled", true );
-                    $('#date').prop( "disabled", true );
+                    $('#shift_id').attr("readonly", true);
+                    $('#date').attr("readonly", true);
 
                     $('#savebutton').removeAttr("disabled");
                     $('#savebutton').removeClass("bg-inactive");

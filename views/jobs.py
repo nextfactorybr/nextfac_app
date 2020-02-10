@@ -58,7 +58,6 @@ def new_job():
         projects = request.form.getlist('project_id[]')
         filaments = request.form.getlist('filament_id[]')
         list_obs = request.form.getlist('obs[]')
-        list_status = request.form.getlist('status[]')
         date = request.form['date']
         shift_id = request.form['shift_id']
         for count in range(len(printers)):
