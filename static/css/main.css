@@ -54,3 +54,13 @@ select[readonly] {
   background: linear-gradient( -45deg, white 45%, black 30%);
   border-radius: 50%;
 }
+
+.card-header{
+    padding: 8px !important;
+    background: rgb(69,180,73) !important;
+    background: linear-gradient(90deg, rgba(69,180,73,1) 5%, rgba(255,255,255,1) 5%) !important;
+}
+
+.card-header:first-child {
+    border-radius: 0 !important;
+}

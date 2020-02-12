@@ -8,7 +8,7 @@ project_blueprints = Blueprint("projects", __name__)
 
 view = {
             "title": "Projects",
-            "icon": "fa-file-code-o",
+            "icon": "fa-puzzle-piece",
             "name": "projects",
             "nav_on": True,
             "search_on": False

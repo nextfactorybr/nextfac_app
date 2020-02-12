@@ -7,7 +7,7 @@ shift_blueprints = Blueprint("shifts", __name__)
 
 view = {
             "title": "Shifts",
-            "icon": "fa-print",
+            "icon": "fa-clock-o",
             "name": "shifts",
             "nav_on": True,
             "search_on": False

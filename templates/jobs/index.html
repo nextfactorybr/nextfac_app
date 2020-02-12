@@ -28,12 +28,12 @@
                     {% set count.value = count.value + 1 %}
                       <div class="card mb-1">
                         <div class="card-header" id='heading{{ job._id }}'>
-                          <h5 class="float-left mb-0 col-md-6">
-                            <a class="btn btn-link col-md-12 text-left" data-toggle="collapse" data-target='#collapse{{grouper}}{{grouper2}}' aria-expanded="false" aria-controls='collapse{{grouper}}{{grouper2}}'>
-                              <i class="fa fa-file-text-o" aria-hidden="true"></i> {{grouper}} {{items[0].shift.desc}}
-
+                          <div class="pull-left mb-0 col-md-6 ml-0 pl-0" data-toggle="collapse" data-target='#collapse{{grouper}}{{grouper2}}' aria-expanded="false" aria-controls='collapse{{grouper}}{{grouper2}}'>
+                            <i style="font-size: 28px" class="fa fa-file-text-o fa-2x p-1 mr-3 float-left text-white" aria-hidden="true"></i>
+                            <a class="btn btn-link text-left">
+                              <i aria-hidden="true"></i> {{grouper}} {{items[0].shift.desc}}
                             </a>
-                          </h5>
+                          </div>
                              <div id="options" class="col-md-6 float-right text-right mb-0 mt-1">
                                  <span><a title="heat" class="btn btn-warning btn-sm text-white conf-heat" href="{{url_for('jobs.heat_printers', date=grouper, shift_id=grouper2)}}"><i class="fa fa-fire" aria-hidden="true"></i></a></span>
                                  <span><a title="start" class="btn btn-success btn-sm start text-white" data-date="{{grouper}}" data-shift="{{grouper2}}"><i class="fa fa-play" aria-hidden="true"></i></a></span>
@@ -83,7 +83,7 @@
             {% endfor %}
             </div>
         </div>
-         <a class="btn btn-primary" href="{{url_for('jobs.new_job')}}"> Create New </a>
+         <a class="btn btn-success" href="{{url_for('jobs.new_job')}}"> Create New </a>
          <span class="pull-right">{{ pagination.links }}</span>
     </section>
 
