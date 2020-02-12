@@ -85,9 +85,9 @@
                           <td>
                                <div class="form-group input-group">
                                 {% if latest_jobs[loop.index0].fromfilaments[0] is defined %}
-                                   <div style="background-color: {{ latest_jobs[loop.index0].fromfilaments[0].hex_cor }}" class="color-picker border border-secondary rounded-circle cor-pr{{loop.index}}"></div>
+                                   <div style="background-color: {{ latest_jobs[loop.index0].fromfilaments[0].hex_cor }}" class="color-picker border rounded-circle cor-pr{{loop.index}}"></div>
                                 {% else %}
-                                    <div class="color-picker border border-secondary rounded-circle cor-pr{{loop.index}} gradient-circle"></div>
+                                    <div class="color-picker border rounded-circle cor-pr{{loop.index}} gradient-circle"></div>
                                 {% endif %}
                             </div>
                           </td>

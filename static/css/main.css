@@ -6,6 +6,10 @@
     color:#000 !important;
 }
 
+.text-black {
+    color:#000 !important;
+}
+
 select[readonly] {
     background: #eee;
     pointer-events: none;

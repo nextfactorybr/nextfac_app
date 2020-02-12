@@ -38,14 +38,14 @@
          </div>
         <a class="text-white" style="font-size: 20px; font-weight: 200"><i class="fa {{view.icon}} fa-2x" aria-hidden="true" style="font-size: 24px;"></i> {{view.title}}</a>
         {% if view.search_on %}
-            <span class="text-right">{{ pagination.info }}</span>
+            <span class="text-right d-none d-sm-none d-md-block">{{ pagination.info }}</span>
             <!-- Search form -->
-            <form action="/{{view.name}}/search" method="post" class="form-inline">
+            <form action="/{{view.name}}/search" method="post" class="form-inline d-none d-xl-block">
             <input name="parameter" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-light my-2 my-sm-0" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
             </form>
         {% endif %}
-        <div class="user_info pull-right">
+        <div class="user_info pull-right d-none d-xl-block">
             <span class="text-white mt-3 text-right"><i class="fa fa-user-circle-o" aria-hidden="true"></i> Hi, {{ session['name'] }} <a class="text-white ml-2" href="{{ url_for('auth.logout') }}"><i class="fa fa-sign-out text-white"></i> Logout</a></span>
         </div>
         </nav>
@@ -53,7 +53,7 @@
     <!--Menu-->
         <div class="collapse" id="navbarToggleExternalContent">
             <div class="p-1 m-0 row bg-light">
-                <section class="menu_items text-left">
+                <section class="menu_items text-left d-none d-xl-block">
                 <a class="btn btn-light ml-3" href="/jobs/"><i class="fa fa-archive"></i> Jobs</a>
                 <a class="btn btn btn-light ml-1" href="/shifts/"><i class="fa fa-clock-o"></i> Shifts</a>
                 <a class="btn btn btn-light ml-1" href="/printers/"><i class="fa fa-print"></i> Printers</a>
@@ -61,6 +61,18 @@
                 <a class="btn btn btn-light ml-1" href="/filaments/"><i class="fa fa-cube"></i> Filaments</a>
                 <a class="btn btn btn-light ml-1" href="/auth/"><i class="fa fa-cog"></i> Settings</a>
                 </section>
+
+                <section class="menu_items text-left d-lg-block d-xl-none">
+                <a class="btn btn-light ml-1" href="/jobs/"><i class="fa fa-archive"></i> Jobs</a><br/>
+                <a class="btn btn btn-light ml-1" href="/shifts/"><i class="fa fa-clock-o"></i> Shifts</a><br/>
+                <a class="btn btn btn-light ml-1" href="/printers/"><i class="fa fa-print"></i> Printers</a><br/>
+                <a class="btn btn btn-light ml-1" href="/projects/"><i class="fa fa-puzzle-piece"></i> Projects</a><br/>
+                <a class="btn btn btn-light ml-1" href="/filaments/"><i class="fa fa-cube"></i> Filaments</a><br/>
+                <a class="btn btn btn-light ml-1" href="/auth/"><i class="fa fa-cog"></i> Settings</a><br/>
+                <span class="text-black ml-3 mt-2 text-right"><i class="fa fa-user-circle-o" aria-hidden="true"></i> Hi, {{ session['name'] }} <a class="text-black ml-2" href="{{ url_for('auth.logout') }}"><i class="fa fa-sign-out text-black"></i> Logout</a></span>
+                </section>
+
+
             </div>
         </div>
         <!--/.Menu-->
