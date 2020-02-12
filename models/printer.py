@@ -8,7 +8,8 @@ from common.Database import Database
 class Printer:
     collection = "printers"
 
-    def __init__(self, name: str, url: str, apikey: str, _id: str = None):
+    def __init__(self, name: str, url: str, apikey: str, server: bool = None, _id: str = None):
+        self.server = server
         self.name = name
         self.url = url
         self.apikey = apikey
@@ -20,7 +21,8 @@ class Printer:
             "_id": self._id,
             "name": self.name,
             "url": self.url,
-            "apikey": self.apikey
+            "apikey": self.apikey,
+            "server": self.server
         }
 
     def save_to_mongo(self):

@@ -46,6 +46,7 @@ def new_printer():
         name = request.form['name']
         url = request.form['url']
         apikey = request.form['apikey']
+        server = True if 'server' in request.form else False
 
         if Printer.find_one_by("name", name) or Printer.find_one_by("url", url):
             message = Markup('<i class="fa fa-warning"></i> Error: The printer/url you are trying to create already exist.')
@@ -54,7 +55,7 @@ def new_printer():
             view['search_on'] = False
             return render_template('printers/new_printer.html', view=view)
         else:
-            Printer(name, url, apikey).save_to_mongo()
+            Printer(name, url, apikey, server).save_to_mongo()
             flash('The printer was successfully created!', 'success')
             return redirect(url_for('printers.index'))
     else:
@@ -72,6 +73,7 @@ def edit_printer(printer_id):
         printer.name = request.form['name']
         printer.url = request.form['url']
         printer.apikey = request.form['apikey']
+        printer.server = True if 'server' in request.form else False
 
         x_printer = Printer.find_one_by("url", printer.url)
         if x_printer is not None:
