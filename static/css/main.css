@@ -59,10 +59,37 @@ select[readonly] {
   border-radius: 50%;
 }
 
-.card-header{
+.accordion-list-success .card-header{
     padding: 8px !important;
     background: rgb(69,180,73) !important;
     background: linear-gradient(90deg, rgba(69,180,73,1) 5%, rgba(255,255,255,1) 5%) !important;
+}
+
+.accordion-list-warning .card-header{
+    padding: 8px !important;
+    background: rgb(255,193,7);
+    background: linear-gradient(90deg, rgba(255,193,7,1) 5%, rgba(255,255,255,1) 5%);
+}
+
+.accordion-list-danger .card-header{
+    padding: 8px !important;
+    background: rgb(220,53,69);
+    background: linear-gradient(90deg, rgba(220,53,69,1) 5%, rgba(255,255,255,1) 5%);
+}
+
+.dashboard-card-success .card-header{
+    background: rgb(69,180,73) !important;
+    background: linear-gradient(90deg, rgba(69,180,73,1) 20%, rgba(255,255,255,1) 20%) !important;
+}
+
+.dashboard-card-warning .card-header{
+    background: rgb(255,193,7);
+    background: linear-gradient(90deg, rgba(255,193,7,1) 20%, rgba(255,255,255,1) 20%);
+}
+
+.dashboard-card-danger .card-header{
+    background: rgb(220,53,69);
+    background: linear-gradient(90deg, rgba(220,53,69,1) 20%, rgba(255,255,255,1) 20%);
 }
 
 .card-header:first-child {

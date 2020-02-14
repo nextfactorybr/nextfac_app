@@ -83,3 +83,27 @@ class Printer:
                 ]
             })
         return [cls(**elem) for elem in result] if result else None
+
+    @staticmethod
+    def get_status(printer_id):
+        printer = Printer.find_one_by("_id", printer_id)
+        con = OctoRest(url=printer.url, apikey=printer.apikey)
+        return con.state()
+
+    @staticmethod
+    def get_offset_temperature(printer_id):
+        printer = Printer.find_one_by("_id", printer_id)
+        con = OctoRest(url=printer.url, apikey=printer.apikey)
+        return con.tool()
+
+    @staticmethod
+    def get_bed_temperature(printer_id):
+        printer = Printer.find_one_by("_id", printer_id)
+        con = OctoRest(url=printer.url, apikey=printer.apikey)
+        return con.bed()
+
+    @staticmethod
+    def get_job_info(printer_id):
+        printer = Printer.find_one_by("_id", printer_id)
+        con = OctoRest(url=printer.url, apikey=printer.apikey)
+        return con.job_info()

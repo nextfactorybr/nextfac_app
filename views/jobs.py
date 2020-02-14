@@ -33,7 +33,6 @@ def index():
     offset = 4 * page
     start = (page - 1) * 4
 
-
     search = False
     q = request.args.get('q')
     if q:

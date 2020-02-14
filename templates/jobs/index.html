@@ -26,7 +26,7 @@
                 {% for grouper2, items in job|groupby('shift_id')|sort(reverse = True) %}
                   {% if outer_loop.index > start and count.value <= pagination.per_page %}
                     {% set count.value = count.value + 1 %}
-                      <div class="card mb-1">
+                      <div class="card mb-1 accordion-list-success">
                         <div class="card-header" id='heading{{ job._id }}'>
                           <div class="pull-left mb-0 col-md-6 ml-0 pl-0" data-toggle="collapse" data-target='#collapse{{grouper}}{{grouper2}}' aria-expanded="false" aria-controls='collapse{{grouper}}{{grouper2}}'>
                             <i style="font-size: 28px" class="fa fa-file-text-o fa-2x p-1 mr-3 float-left text-white" aria-hidden="true"></i>

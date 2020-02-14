@@ -4,7 +4,7 @@
         <div class="list-group list-group-flush mb-3">
             <div id="accordion">
            {% for filament in filaments | sort(attribute='cor') %}
-                  <div class="card mb-1">
+                  <div class="card mb-1 accordion-list-success">
                     <div class="card-header" id='heading{{ filament._id }}'>
                        <div class="pull-left mb-0 col-md-6 ml-0 pl-0" data-toggle="collapse" data-target='#collapse{{ filament._id }}' aria-expanded="false" aria-controls='collapse{{ filament._id }}'>
                             <i style="font-size: 28px" class="fa fa-cube fa-2x p-1 mr-3 float-left text-white" aria-hidden="true"></i>
@@ -32,7 +32,7 @@
             {% endfor %}
             </div>
         </div>
-         <a class="btn btn-primary" href="{{url_for('filaments.new_filament')}}"> Create New </a>
+         <a class="btn btn-success" href="{{url_for('filaments.new_filament')}}"> Create New </a>
          <span class="pull-right">{{ pagination.links }}</span>
     </section>
 

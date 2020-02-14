@@ -128,3 +128,17 @@ def search():
         return render_template('printers/index.html', printers=printers, pagination=pagination, view=view)
     else:
         return redirect(url_for('printers.index'))
+
+
+@printer_blueprints.route('/dashboard', methods=['GET', 'POST'])
+@requires_login
+def dashboard():
+
+    view['title'] = "Dashboard"
+    view["icon"] = "fa-dashboard"
+    view['search_on'] = False
+
+    if request.method == 'POST':
+        pass
+    else:
+        return render_template('printers/dashboard.html', view=view)
