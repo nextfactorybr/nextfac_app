@@ -141,4 +141,5 @@ def dashboard():
     if request.method == 'POST':
         pass
     else:
-        return render_template('printers/dashboard.html', view=view)
+        printers = Printer.all()
+        return render_template('printers/dashboard.html', view=view, printers=printers)

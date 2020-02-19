@@ -19,7 +19,7 @@ def requires_admin(f: Callable) -> Callable:
     def decorated_function(*args, **kwargs):
         if session.get('email') != current_app.config.get('ADMIN', ''):
             flash('You need to be an system administrator to access this section', 'danger')
-            return redirect(url_for('auth.login_user'))
+            return redirect(url_for('jobs.index'))
         return f(*args, **kwargs)
 
     return decorated_function

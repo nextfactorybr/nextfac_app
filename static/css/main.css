@@ -77,21 +77,27 @@ select[readonly] {
     background: linear-gradient(90deg, rgba(220,53,69,1) 5%, rgba(255,255,255,1) 5%);
 }
 
-.dashboard-card-success .card-header{
+.dashboard-card-success{
     background: rgb(69,180,73) !important;
     background: linear-gradient(90deg, rgba(69,180,73,1) 20%, rgba(255,255,255,1) 20%) !important;
 }
 
-.dashboard-card-warning .card-header{
+.dashboard-card-warning{
     background: rgb(255,193,7);
     background: linear-gradient(90deg, rgba(255,193,7,1) 20%, rgba(255,255,255,1) 20%);
 }
 
-.dashboard-card-danger .card-header{
+.dashboard-card-danger{
     background: rgb(220,53,69);
     background: linear-gradient(90deg, rgba(220,53,69,1) 20%, rgba(255,255,255,1) 20%);
 }
 
-.card-header:first-child {
-    border-radius: 0 !important;
+.dashboard-card-inactive{
+    background: rgb(108,117,125);
+    background: linear-gradient(90deg, rgba(108,117,125,1) 20%, rgba(255,255,255,1) 20%);
+}
+
+.dashboard-card-primary{
+    background: rgb(0,123,255);
+    background: linear-gradient(90deg, rgba(0,123,255,1) 20%, rgba(255,255,255,1) 20%);
 }
