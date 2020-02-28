@@ -10,7 +10,7 @@
           <div class="card-header p-0 m-0 dashboard-card-{{ history['cor'] }}" id='heading{{ printer._id }}' style="cursor: pointer" aria-hidden="true" data-toggle="collapse" data-target='#collapse{{ printer._id }}' aria-expanded="false" aria-controls='collapse{{ printer._id }}'>
               <img class="p-1 mr-3 float-left text-white ml-1 mt-1" src="{{ static('images/icon_3dprinter.png') }}" height="48px" />
               <span class="pull-left m-1">
-                  {{printer.name}}
+                  <a class="text-dark" href="{{printer.url}}" target="_blank">{{printer.name}}</a>
                   <br/>
                   status: {{ history['state'] }}
               </span>
