@@ -1,49 +1,52 @@
 {% extends "base.html" %}
 {% block  content%}
-<meta http-equiv="refresh" content="600" >
-   <div class="row" id="pr-dashboard">
-     {% for printer in printers %}
-       {% set history = printer.get_history() %}
-       <div class="col-sm-3">
-        <div class="card mb-2" style="width: 250px">
-          <div class="card-header p-0 m-0 dashboard-card-{{ history['cor'] }}" id='heading{{ printer._id }}'>
-              <i class="fa fa-print fa-2x p-1 mr-3 float-left text-white ml-2 mt-2"></i>
-              <span class="pull-left m-1">
-                  {{printer.name}}
-                  <br/>
-                  status: {{ history['state'] }}
-              </span>
-              <p style="cursor: pointer;" class="pull-right p-2 pt-3 pb-3 mb-0 bg-secondary" aria-hidden="true" data-toggle="collapse" data-target='#collapse{{ printer._id }}' aria-expanded="false" aria-controls='collapse{{ printer._id }}'><i class="fa fa-chevron-down text-white"></i></p>
-          </div>
-          <div id='collapse{{ printer._id }}' class="collapse multi-collapse" aria-labelledby='heading{{ printer._id }}'>
-              <div class="card-body text-dark p-2" style="height: 240px">
-                <section class="card-title row">
-                  <div class="text-left col-md-7 m-0">
-                    <h6>
-                        <span>T: {{ history['temperature']['tool'] }}/{{ history['target']['tool'] }}</span>
-                        <br/>
-                        <span >B: {{ history['temperature']['bed'] }}/{{ history['target']['bed'] }}</span>
-                    </h6>
-                  </div>
-                  <div class="text-right col-md-5 pl-1 m-0">
-                    <span><a title="start" class="btn btn-success btn-sm text-white" style="padding: 2px 6px !important;"><i class="fa fa-play" aria-hidden="true"></i></a></span>
-                    <span><a title="pause" class="btn btn-warning btn-sm text-white" style="padding: 2px 6px !important;"><i class="fa fa-pause" aria-hidden="true"></i></a></span>
-                    <span><a title="stop" class="btn btn-danger btn-sm text-white" style="padding: 2px 6px !important;"><i class="fa fa-stop" aria-hidden="true"></i></a></span>
-                  </div>
-                </section>
-                <section class="card-text mt-2">
-                    Hola esto es un texto de teste
-                </section>
-              </div>
-              <div class="card-footer alert-success p-1" style="height: 32px">
-                    <h5>
-                        <span class="pull-left">{{ history['job']['printTime'] }}</span>
-                        <span class="pull-right">15%</span>
-                    </h5>
-              </div>
-         </div>
-        </div>
-       </div>
-     {% endfor %}
-   </div>
+<link href="{{ url_for('static', filename='css/progressbar_tool.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/progressbar_bed.css') }}" rel="stylesheet">
+
+<section id="render_dashboard">
+    <div class="h-100 d-flex justify-content-center align-items-center m-0 p-0" style="filter: grayscale(100%); -webkit-filter: grayscale(100%);">
+        <img src="{{ url_for('static', filename='images/loading.webp') }}" width="25%" />
+    </div>
+    <div class="h-100 d-flex justify-content-center align-items-center m-0 p-0"><span >Loading...</span></div>
+    <div class="h-100 d-flex justify-content-center align-items-center m-0 p-0"><span >Please wait, this may take a while!</span></div>
+</section>
+
+<script type="text/javascript">
+function load(){
+    var msj = document.getElementById("msj_loading");
+    // don't cache ajax or content won't be fresh
+    $.ajax({
+        cache: false,
+        type: 'get',
+        dataType: 'json',
+        headers: { "cache-control": "no-cache" },
+        url: '/printers/dashboard_update',
+
+        beforeSend: function () {
+            if (msj !== null){
+                msj.innerHTML = "Reloading... Please wait, this may take a while depending on the number of printers connected!";
+            }
+        },
+
+        success: function (data) {
+            $("#render_dashboard").html(data.result);
+            if (msj !== null){
+                msj.innerHTML = "";
+            }
+        },
+
+        complete: function() {
+            // Schedule the next request when the current one's complete
+            setTimeout(load, 20000);
+        }
+    });
+// end
+}
+
+$(load());
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+
 {% endblock %}

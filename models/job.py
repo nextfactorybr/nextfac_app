@@ -212,7 +212,7 @@ class Job:
                 con = OctoRest(url=job.printer.url, apikey=job.printer.apikey)
                 if con.state() != "Printing":
                     try:
-                        Printer.connect(job.printer_id)
+                        job.printer.connect()
                         disconnected_list.append([{"job_date": job.date, "job_shift": job.shift_id, "job_id": job._id,
                                                    "project_id": job.project_id, "job_name": job.project.name,
                                                    "printer_id": job.printer_id, "printer_name": job.printer.name,

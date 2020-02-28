@@ -46,12 +46,46 @@ class Printer:
                 state = self.con().connection_info()['current']['state']
                 error204 = "204 No Content"
                 error400 = "400 Bad Request"
-                if state != "Closed" and error204 not in state and error400 not in state:
+                error409 = "Error"
+                if state != "Closed" and error204 not in state and error400 not in state and error409 not in state:
                     return True
             except Exception as e:
                 return False
         else:
             return False
+
+    def connect(self):
+        con = self.con()
+        if not self.state():
+            try:
+                con.connect()
+                return True
+            except Exception as e:
+                raise TypeError(e)
+
+    def start_job(self) -> bool:
+
+        if self.get_flag_operational() or self.get_flag_ready():
+            if self.con().start():
+                return True
+
+        if self.get_flag_paused():
+            if self.con().resume():
+                return True
+
+        return False
+
+    def pause_job(self) -> bool:
+        if self.get_flag_printing():
+            if self.con().pause():
+                return True
+        return False
+
+    def stop_job(self) -> bool:
+        if self.get_flag_printing() or self.get_flag_paused():
+            if self.con().cancel():
+                return True
+        return False
 
     def get_parameters(self):
         if self.state():
@@ -69,38 +103,38 @@ class Printer:
 
     def get_flag_cancelling(self):
         if self.get_parameters():
-            if 'cancelling' in self.get_parameters()['state']['flags']:
-                return self.get_parameters()['state']['flags']['cancelling']
+            if 'Cancelling' in self.get_parameters()['state']['text']:
+                return True
         return False
 
     def get_flag_operational(self):
         if self.get_parameters():
-            if 'operational' in self.get_parameters()['state']['flags']:
-                return self.get_parameters()['state']['flags']['operational']
+            if 'Operational' in self.get_parameters()['state']['text']:
+                return True
         return False
 
     def get_flag_paused(self):
         if self.get_parameters():
-            if 'paused' in self.get_parameters()['state']['flags']:
-                return self.get_parameters()['state']['flags']['paused']
+            if 'Paused' in self.get_parameters()['state']['text']:
+                return True
         return False
 
     def get_flag_pausing(self):
         if self.get_parameters():
-            if 'pausing' in self.get_parameters()['state']['flags']:
-                return self.get_parameters()['state']['flags']['pausing']
+            if 'Pausing' in self.get_parameters()['state']['text']:
+                return True
         return False
 
     def get_flag_printing(self):
         if self.get_parameters():
-            if 'printing' in self.get_parameters()['state']['flags']:
-                return self.get_parameters()['state']['flags']['printing']
+            if 'Printing' in self.get_parameters()['state']['text']:
+                return True
         return False
 
     def get_flag_ready(self):
         if self.get_parameters():
-            if 'ready' in self.get_parameters()['state']['flags']:
-                return self.get_parameters()['state']['flags']['ready']
+            if 'Ready' in self.get_parameters()['state']['text']:
+                return True
         return False
 
     def get_history(self):
@@ -127,46 +161,51 @@ class Printer:
         }
 
         if self.state():
-            flags = self.get_parameters()['state']['flags'] if 'state' in self.get_parameters() else False
-            for flag in flags:
-                if flags[flag]:
-                    history['state'] = flag
+            parameters = self.get_parameters()
 
-            if history['state'] == "operational" or history['state'] == "ready":
+            flags = parameters['state']['flags'] if 'flags' in parameters['state'] else False
+            history['state'] = parameters['state']['text'] if 'text' in parameters['state'] else False
+
+            if history['state'] == "Operational" or history['state'] == "Ready":
                 history['cor'] = "success"
-            if history['state'] == "printing":
+            if history['state'] == "Printing":
                 history['cor'] = "primary"
-            if history['state'] == "pausing" or history['state'] == "paused" or history['state'] == "cancelling":
+            if history['state'] == "Pausing" or history['state'] == "Paused" or history['state'] == "Cancelling":
                 history['cor'] = "warning"
 
-            temps = self.get_parameters()['temperature'] if 'temperature' in self.get_parameters() else False
+            temps = parameters['temperature'] if 'temperature' in parameters else False
             if temps is not False:
-                history['temperature']['tool'] = self.get_tool_temperature(temps) if self.get_tool_temperature(
-                    temps) else 0
-                history['temperature']['bed'] = self.get_bed_temperature(temps) if self.get_bed_temperature(
-                    temps) else 0
+                history['temperature']['tool'] = self.get_tool_temperature(temps) if self.get_tool_temperature(temps) else 0
+                history['temperature']['bed'] = self.get_bed_temperature(temps) if self.get_bed_temperature(temps) else 0
                 history['target']['tool'] = self.get_tool_target(temps) if self.get_tool_target(temps) else 0
                 history['target']['bed'] = self.get_bed_target(temps) if self.get_bed_target(temps) else 0
 
-            job = self.get_job_info()['job'] if 'job' in self.get_job_info() else False
+            job_info = self.get_job_info()
+
+            job = job_info['job'] if 'job' in job_info else False
             if job is not False:
-                history['job']['estimatedPrintTime'] = job['estimatedPrintTime'] if 'estimatedPrintTime' in job else 0
-                # history['job']['estimatedPrintTime'] = str(datetime.timedelta(seconds=job['estimatedPrintTime'])) if 'estimatedPrintTime' in job else 0
+                estimatedPrintTime = job['estimatedPrintTime'] if 'estimatedPrintTime' in job else 0
+                history['job']['estimatedPrintTime'] = str(datetime.timedelta(seconds=estimatedPrintTime)).split('.')[0] if estimatedPrintTime is not None else "00:00:00"
                 # history['job']['filament_length'] = 0
 
-            file = self.get_job_info()['file'] if 'file' in self.get_job_info() else False
+            file = job_info['job']['file'] if 'file' in job_info['job'] else False
             if file is not False:
-                history['job']['file_name'] = file['file_name'] if 'file_name' in file else 0
+                history['job']['file_name'] = str(file['name']).split('.')[0] if file['name'] is not None else "Unknown"
 
-            progress = self.get_job_info()['progress'] if 'progress' in self.get_job_info() else False
+            progress = job_info['progress'] if 'progress' in job_info else False
             if progress is not False:
-                history['job']['completion'] = progress['completion'] if 'completion' in progress else 0
-                history['job']['printTime'] = progress['printTime'] if 'printTime' in progress else 0
-                history['job']['PrintTimeLeft'] = progress['PrintTimeLeft'] if 'PrintTimeLeft' in progress else 0
+                completion = progress['completion'] if 'completion' in progress else 0
+                history['job']['completion'] = str(completion).split('.')[0] + "%"
 
-            last_job = self.get_job_info()['lastPrintTime'] if 'lastPrintTime' in self.get_job_info() else False
+                printTime = progress['printTime'] if 'printTime' in progress else 0
+                history['job']['printTime'] = str(datetime.timedelta(seconds=printTime)).split('.')[0] if printTime is not None else "00:00:00"
+
+                PrintTimeLeft = progress['printTimeLeft'] if 'printTimeLeft' in progress else 0
+                history['job']['printTimeLeft'] = str(datetime.timedelta(seconds=PrintTimeLeft)).split('.')[0] if PrintTimeLeft is not None else "00:00:00"
+
+            last_job = job_info['lastPrintTime'] if 'lastPrintTime' in job_info else False
             if last_job is not False:
-                history['job']['lastPrintTime'] = last_job
+                history['job']['lastPrintTime'] = str(datetime.timedelta(seconds=last_job)).split('.')[0] if last_job is not None else "00:00:00"
 
         return history
 
@@ -199,17 +238,6 @@ class Printer:
                 ]
             })
         return [cls(**elem) for elem in result] if result else None
-
-    @staticmethod
-    def connect(printer_id):
-        printer = Printer.find_one_by("_id", printer_id)
-        con = printer.con()
-        if not printer.state():
-            try:
-                con.connect()
-                return True
-            except Exception as e:
-                raise TypeError(e)
 
     @staticmethod
     def heat(printer_id):
@@ -245,3 +273,20 @@ class Printer:
         if 'tool0' in temps:
             return temps['tool0']['target']
         return False
+
+    @staticmethod
+    def get_time_left(printers):
+        time = 0
+        for printer in printers:
+            if printer.get_flag_printing() is not False:
+                job_info = printer.get_job_info()
+                job = job_info['job'] if 'job' in job_info else False
+                if job is not False:
+                    progress = job_info['progress'] if 'progress' in job_info else False
+                    if progress is not False:
+                        PrintTimeLeft = progress['printTimeLeft'] if 'printTimeLeft' in progress else 0
+                        if PrintTimeLeft is not None and PrintTimeLeft > time:
+                            time = PrintTimeLeft
+
+        left_time = time * 1000
+        return left_time

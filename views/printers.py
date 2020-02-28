@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, make_response, redirect, url_for, flash, Markup
+from flask import Blueprint, request, render_template, make_response, redirect, jsonify, url_for, flash, Markup
 from flask_paginate import Pagination, get_page_parameter
 from models.printer import Printer
 from models.user.decorators import requires_login, requires_admin
@@ -6,12 +6,12 @@ from models.user.decorators import requires_login, requires_admin
 printer_blueprints = Blueprint("printers", __name__)
 
 view = {
-            "title": "Printers",
-            "icon": "fa-print",
-            "name": "printers",
-            "nav_on": True,
-            "search_on": False
-        }
+    "title": "Printers",
+    "icon": "fa-print",
+    "name": "printers",
+    "nav_on": True,
+    "search_on": False
+}
 
 
 @printer_blueprints.route('/')
@@ -49,7 +49,8 @@ def new_printer():
         server = True if 'server' in request.form else False
 
         if Printer.find_one_by("name", name) or Printer.find_one_by("url", url):
-            message = Markup('<i class="fa fa-warning"></i> Error: The printer/url you are trying to create already exist.')
+            message = Markup(
+                '<i class="fa fa-warning"></i> Error: The printer/url you are trying to create already exist.')
             flash(message, 'warning')
             view['title'] = "New Printer"
             view['search_on'] = False
@@ -130,16 +131,60 @@ def search():
         return redirect(url_for('printers.index'))
 
 
-@printer_blueprints.route('/dashboard', methods=['GET', 'POST'])
+@printer_blueprints.route('/dashboard', methods=['GET'])
 @requires_login
 def dashboard():
-
     view['title'] = "Dashboard"
     view["icon"] = "fa-dashboard"
     view['search_on'] = False
 
-    if request.method == 'POST':
-        pass
-    else:
-        printers = Printer.all()
-        return render_template('printers/dashboard.html', view=view, printers=printers)
+    return render_template('printers/dashboard.html', view=view)
+
+
+@printer_blueprints.route('/dashboard_update', methods=['GET'])
+@requires_login
+def dashboard_update():
+    printers = Printer.all()
+    left_time = Printer.get_time_left(printers)
+    result = render_template('printers/partial_dashboard.html', printers=printers, left_time=left_time)
+    return jsonify(result=result)
+
+
+@printer_blueprints.route('/start/printer_id=<string:printer_id>', methods=['GET'])
+@requires_login
+def start(printer_id):
+    printer = Printer.get_by_id(printer_id)
+    if printer.start_job():
+        return jsonify(result=True)
+
+    return jsonify(result=False)
+
+
+@printer_blueprints.route('/pause/printer_id=<string:printer_id>', methods=['GET'])
+@requires_login
+def pause(printer_id):
+    printer = Printer.get_by_id(printer_id)
+    if printer.pause_job():
+        return jsonify(result=True)
+
+    return jsonify(result=False)
+
+
+@printer_blueprints.route('/stop/printer_id=<string:printer_id>', methods=['GET'])
+@requires_login
+def stop(printer_id):
+    printer = Printer.get_by_id(printer_id)
+    if printer.stop_job():
+        return jsonify(result=True)
+
+    return jsonify(result=False)
+
+
+@printer_blueprints.route('/connect/printer_id=<string:printer_id>', methods=['GET'])
+@requires_login
+def connect(printer_id):
+    printer = Printer.find_one_by("_id", printer_id)
+    if printer.connect():
+        return jsonify(result=True)
+
+    return jsonify(result=False)

@@ -36,7 +36,7 @@
             <img src="{{ url_for('static', filename='images/logo-white-48x48.png') }}" height="48px">
             <span class="text-white align-middle">Next Factory®</span>
          </div>
-        <a class="text-white" style="font-size: 20px; font-weight: 200"><i class="fa {{view.icon}} fa-2x" aria-hidden="true" style="font-size: 24px;"></i> {{view.title}}</a>
+        <a class="text-white mr-5" style="font-size: 20px; font-weight: 200"><i class="fa {{view.icon}} fa-2x" aria-hidden="true" style="font-size: 24px;"></i> {{view.title}}</a>
         {% if view.search_on %}
             <span class="text-right d-none d-sm-none d-md-block">{{ pagination.info }}</span>
             <!-- Search form -->
@@ -54,23 +54,26 @@
         <div class="collapse" id="navbarToggleExternalContent">
             <div class="p-1 m-0 row bg-light">
                 <section class="menu_items text-left d-none d-xl-block">
-                <a class="btn btn-light ml-3" href="/printers/dashboard"><i class="fa fa-dashboard"></i> Dashboard</a>
-                <a class="btn btn-light ml-3" href="/jobs/"><i class="fa fa-archive"></i> Jobs</a>
-                <a class="btn btn btn-light ml-1" href="/shifts/"><i class="fa fa-clock-o"></i> Shifts</a>
-                <a class="btn btn btn-light ml-1" href="/printers/"><i class="fa fa-print"></i> Printers</a>
-                <a class="btn btn btn-light ml-1" href="/projects/"><i class="fa fa-puzzle-piece"></i> Projects</a>
-                <a class="btn btn btn-light ml-1" href="/filaments/"><i class="fa fa-cube"></i> Filaments</a>
-                <a class="btn btn btn-light ml-1" href="/auth/"><i class="fa fa-cog"></i> Settings</a>
+                <a class="btn btn-light ml-3" href="/printers/dashboard">Dashboard</a>
+                <a class="btn btn-light ml-1" href="/jobs/">Jobs</a>
+                <a class="btn btn btn-light ml-1" href="/shifts/">Shifts</a>
+                <a class="btn btn btn-light ml-1" href="/printers/">Printers</a>
+                <a class="btn btn btn-light ml-1" href="/projects/">Projects</a>
+                <a class="btn btn btn-light ml-1" href="/filaments/">Filaments</a>
+                <a class="btn btn btn-light ml-1" href="/auth/">Settings</a>
                 </section>
 
                 <section class="menu_items text-left d-lg-block d-xl-none">
-                <a class="btn btn-light ml-1" href="/jobs/"><i class="fa fa-archive"></i> Jobs</a><br/>
-                <a class="btn btn btn-light ml-1" href="/shifts/"><i class="fa fa-clock-o"></i> Shifts</a><br/>
-                <a class="btn btn btn-light ml-1" href="/printers/"><i class="fa fa-print"></i> Printers</a><br/>
-                <a class="btn btn btn-light ml-1" href="/projects/"><i class="fa fa-puzzle-piece"></i> Projects</a><br/>
-                <a class="btn btn btn-light ml-1" href="/filaments/"><i class="fa fa-cube"></i> Filaments</a><br/>
-                <a class="btn btn btn-light ml-1" href="/auth/"><i class="fa fa-cog"></i> Settings</a><br/>
-                <span class="text-black ml-3 mt-2 text-right"><i class="fa fa-user-circle-o" aria-hidden="true"></i> Hi, {{ session['name'] }} <a class="text-black ml-2" href="{{ url_for('auth.logout') }}"><i class="fa fa-sign-out text-black"></i> Logout</a></span>
+                <span class="text-black ml-3 mt-1 text-right"><i class="fa fa-user-circle-o" aria-hidden="true"></i> Hi, {{ session['name'] }} <a class="text-black ml-2" href="{{ url_for('auth.logout') }}"><i class="fa fa-sign-out text-black"></i> Logout</a></span>
+                <hr class="mb-0">
+                <a class="btn btn-light ml-1" href="/printers/dashboard">Dashboard</a><br/>
+                <a class="btn btn-light ml-1" href="/jobs/">Jobs</a><br/>
+                <a class="btn btn-light ml-1" href="/shifts/">Shifts</a><br/>
+                <a class="btn btn-light ml-1" href="/printers/">Printers</a><br/>
+                <a class="btn btn-light ml-1" href="/projects/">Projects</a><br/>
+                <a class="btn btn-light ml-1" href="/filaments/">Filaments</a><br/>
+                <a class="btn btn-light ml-1" href="/auth/">Settings</a><br/>
+
                 </section>
 
 
@@ -107,5 +110,6 @@
    <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
 </body>
 </html>

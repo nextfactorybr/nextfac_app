@@ -1,7 +1,7 @@
 function DarkenPageWithLoading() {
     var loadTopPos;
     $(".DarkBg").remove();
-    $("body").prepend("<div class='DarkBg d-flex align-items-center justify-content-center'><div class='spinner-grow' style='width: 3rem; height: 3rem;' role='status'><span class='sr-only'>Loading...</span></div></div>");
+    $("body").prepend("<div class='DarkBg justify-content-center align-items-center'><div class='h-100 d-flex justify-content-center align-items-center m-0 p-0' style='filter: grayscale(100%); -webkit-filter: grayscale(100%);'><img src='/static/images/loading.webp' width='20%' /></div></div>");
 
         $(".DarkBg").css({
             "height": $(document).height() + "px",
