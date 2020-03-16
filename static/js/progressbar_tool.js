@@ -59,6 +59,7 @@ for (i = 0; i < cs.length; i++) {
     .append("path")
     .datum({ endAngle: 0 })
     .attr({
+      class: "loadfill",
       d: arcLine,
       transform: "rotate(-90)"
     })

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block  content%}
+    <section class="dragndrop">
+        {{ dropzone.create(action='/projects/dragndrop') }}
+
+        {{ dropzone.config() }}
+    </section>
+    {{ dropzone.style('border: 2px dashed #45B449; color: #45B449; font-size: 28px; font-weight: bold; margin: 10%; min-height: 400px;') }}
+{% endblock %}

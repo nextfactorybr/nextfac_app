@@ -1,18 +1,24 @@
-from flask import Blueprint, request, render_template, make_response, redirect, url_for, flash, Markup
+import re
+
+from flask import Blueprint, request, render_template, make_response, redirect, url_for, flash, Markup, current_app
 from flask_paginate import Pagination, get_page_parameter
+from werkzeug.utils import secure_filename
+
 from models.project import Project
 from models.shift import Shift
 from models.user.decorators import requires_login, requires_admin
+from common.utils import Utils
+import os
 
 project_blueprints = Blueprint("projects", __name__)
 
 view = {
-            "title": "Projects",
-            "icon": "fa-puzzle-piece",
-            "name": "projects",
-            "nav_on": True,
-            "search_on": False
-        }
+    "title": "Projects",
+    "icon": "fa-puzzle-piece",
+    "name": "projects",
+    "nav_on": True,
+    "search_on": False
+}
 
 
 @project_blueprints.route('/', methods=['GET'])
@@ -130,6 +136,42 @@ def edit_project(project_id):
 @requires_login
 def remove_project(project_id):
     project = Project.get_by_id(project_id)
+    file_url = project.path
+    os.remove(file_url)
     project.remove_from_mongo()
     flash('The project was deleted!', 'danger')
     return redirect(url_for('projects.index'))
+
+
+@project_blueprints.route('/dragndrop', methods=['GET', 'POST'])
+@requires_login
+def dragndrop():
+    if request.method == 'POST':
+        file = request.files['file']
+
+        if file.filename.split('.')[1] != 'gcode':
+            return 'Gcode only', 400
+
+        temp_path = current_app.config.get('TEMPORAL_FOLDER', '')
+        file_url_temp = os.path.join(temp_path, secure_filename(file.filename))
+        file.save(file_url_temp)
+
+        name = re.sub('.gcode', '', str(file.filename))
+        time = Utils.get_print_time(file_url_temp)
+        weight = Utils.get_weight(file_url_temp)
+        shift_id = "bff61902d02b4e029444fb0d2d4d702d"
+
+        if Project.find_one_by("name", name):
+            os.remove(file_url_temp)
+            return "This file already exists, please delete it first!", 400
+        else:
+            upload_path = current_app.config.get('UPLOAD_FOLDER', '')
+            file_url = os.path.join(upload_path, secure_filename(file.filename))
+            os.replace(file_url_temp, file_url)
+            path = file_url
+            Project(name, time, weight, shift_id, path).save_to_mongo()
+            return "Upload project successfully", 200
+    else:
+        view['title'] = "DragnDrop"
+        view['search_on'] = False
+        return render_template('projects/dragndrop.html', view=view)

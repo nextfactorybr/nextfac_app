@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask, render_template, session, redirect, url_for, flash
-
+from flask_dropzone import Dropzone
 from models import helpers
 from views.jobs import job_blueprints
 from views.printers import printer_blueprints
@@ -10,10 +10,20 @@ from views.projects import project_blueprints
 from views.filaments import filament_blueprints
 from views.users import user_blueprints
 
+base_path = os.path.abspath(os.path.dirname(__file__))
+upload_path = os.path.join(base_path, 'static/gcodes/files/')
+temp_path = os.path.join(base_path, 'static/gcodes/temporal/')
+
 app = Flask(__name__)
+dropzone = Dropzone(app)
 app.secret_key = 'cd48e1c22de0961d5d1bfb14f8a66e006cfb1cfbf3f0c0f3'
+#app.config['DROPZONE_ENABLE_CSRF'] = True   #CSRF Protection Enabled
+app.config['DROPZONE_UPLOAD_MULTIPLE'] = True  # enable parallel upload
+app.config['DROPZONE_PARALLEL_UPLOADS'] = 3  # handle 3 file per request
 app.config.update(
-    ADMIN=os.environ.get('ADMIN')
+    ADMIN=os.environ.get('ADMIN'),
+    UPLOAD_FOLDER=upload_path,
+    TEMPORAL_FOLDER=temp_path
 )
 
 

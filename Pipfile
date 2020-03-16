@@ -7,7 +7,6 @@ verify_ssl = true
 
 [packages]
 flask = "*"
-blueprints = "*"
 beautifulsoup4 = "*"
 requests = "*"
 pymongo = "*"
@@ -19,6 +18,9 @@ fpdf = "*"
 flask-paginate = "*"
 passlib = "*"
 python-dotenv = "*"
+flask-blueprint = "*"
+flask-dropzone = "*"
+csrf = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
