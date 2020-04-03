@@ -101,3 +101,11 @@ select[readonly] {
     background: rgb(0,123,255);
     background: linear-gradient(90deg, rgba(0,123,255,1) 20%, rgba(255,255,255,1) 20%);
 }
+
+.dz-error-mark{
+filter: invert(78%) sepia(93%) saturate(1276%) hue-rotate(329deg) brightness(119%) contrast(119%) !important;
+}
+
+.dz-success-mark{
+filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(119%) contrast(119%) !important;
+}

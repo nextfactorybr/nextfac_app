@@ -9,6 +9,7 @@ from models.printer import Printer
 from models.project import Project
 from models.shift import Shift
 from models.user.decorators import requires_login, requires_admin
+import time
 
 job_blueprints = Blueprint("jobs", __name__)
 
@@ -24,6 +25,7 @@ view = {
 @job_blueprints.route('/', methods=['GET'])
 @requires_login
 def index():
+
     counter = Job.jobs_amount()
     jobs = Job.all()
 

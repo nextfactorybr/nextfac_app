@@ -68,13 +68,26 @@ class Job:
         except Exception:
             raise TypeError("File not found!")
 
+    @staticmethod
+    def clean_all(con):
+        if con.files() is not None:
+            try:
+                con.delete(location='local/*')
+                return True
+            except Exception:
+                raise TypeError("Error: Can't delete the files")
+        else:
+            return True
+
     def print(self):
         printer = self.con()
         ext = '.gcode'
-        file = self.project.path + self.project.name + ext
+        file = self.project.name + ext
         check_status = self.check_status(printer)
         if not check_status:
             return check_status
+        self.clean_all(printer)
+        printer.upload(self.project.path)
         file_exist = self.file_exist(printer, file)
         if not file_exist:
             return file_exist

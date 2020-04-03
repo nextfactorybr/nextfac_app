@@ -5,6 +5,8 @@ from octorest import OctoRest
 from common.Database import Database
 import json
 import datetime
+import time
+import concurrent.futures
 
 
 class Printer:
@@ -36,32 +38,35 @@ class Printer:
     def con(self):
         try:
             con = OctoRest(url=self.url, apikey=self.apikey)
-            return con
         except Exception as e:
             return False
+        else:
+            return con
 
     def state(self):
-        if self.con() is not False:
+        if isinstance(self.con(), bool):
+            return False
+        else:
             try:
                 state = self.con().connection_info()['current']['state']
                 error204 = "204 No Content"
                 error400 = "400 Bad Request"
                 error409 = "Error"
-                if state != "Closed" and error204 not in state and error400 not in state and error409 not in state:
+                error_closed = "Closed"
+                if error_closed not in state and error204 not in state and error400 not in state and error409 not in state:
                     return True
             except Exception as e:
                 return False
-        else:
-            return False
 
     def connect(self):
-        con = self.con()
         if not self.state():
             try:
-                con.connect()
-                return True
+                con = self.con()
             except Exception as e:
                 raise TypeError(e)
+            else:
+                con.connect()
+                return True
 
     def start_job(self) -> bool:
 
@@ -137,8 +142,12 @@ class Printer:
                 return True
         return False
 
-    def get_history(self):
+    @staticmethod
+    def do_history(printer_id):
+        self = Printer.get_by_id(printer_id)
         history = {
+            "printer_id": self._id,
+            "printer_name": self.name,
             "state": "inactive",
             "cor": "danger",
             "temperature": {
@@ -154,17 +163,18 @@ class Printer:
                 "estimatedPrintTime": 0,
                 "lastPrintTime": 0,
                 "filament_length": 0,
-                "completion": 0,
+                "completion": '0%',
                 "printTime": 0,
-                "PrintTimeLeft": 0
+                "printTimeLeft": 0,
+                "left_time": 0,
             }
         }
 
-        if self.state():
-            parameters = self.get_parameters()
+        parameters = self.get_parameters()
+        if not isinstance(parameters, bool):
 
-            flags = parameters['state']['flags'] if 'flags' in parameters['state'] else False
-            history['state'] = parameters['state']['text'] if 'text' in parameters['state'] else False
+            # flags = parameters['state']['flags'] if 'flags' in parameters['state'] else False
+            history['state'] = parameters['state']['text'] if 'text' in parameters['state'] else "inactive"
 
             if history['state'] == "Operational" or history['state'] == "Ready":
                 history['cor'] = "success"
@@ -175,8 +185,10 @@ class Printer:
 
             temps = parameters['temperature'] if 'temperature' in parameters else False
             if temps is not False:
-                history['temperature']['tool'] = self.get_tool_temperature(temps) if self.get_tool_temperature(temps) else 0
-                history['temperature']['bed'] = self.get_bed_temperature(temps) if self.get_bed_temperature(temps) else 0
+                history['temperature']['tool'] = self.get_tool_temperature(temps) if self.get_tool_temperature(
+                    temps) else 0
+                history['temperature']['bed'] = self.get_bed_temperature(temps) if self.get_bed_temperature(
+                    temps) else 0
                 history['target']['tool'] = self.get_tool_target(temps) if self.get_tool_target(temps) else 0
                 history['target']['bed'] = self.get_bed_target(temps) if self.get_bed_target(temps) else 0
 
@@ -185,7 +197,8 @@ class Printer:
             job = job_info['job'] if 'job' in job_info else False
             if job is not False:
                 estimatedPrintTime = job['estimatedPrintTime'] if 'estimatedPrintTime' in job else 0
-                history['job']['estimatedPrintTime'] = str(datetime.timedelta(seconds=estimatedPrintTime)).split('.')[0] if estimatedPrintTime is not None else "00:00:00"
+                history['job']['estimatedPrintTime'] = str(datetime.timedelta(seconds=estimatedPrintTime)).split('.')[
+                    0] if estimatedPrintTime is not None else "00:00:00"
                 # history['job']['filament_length'] = 0
 
             file = job_info['job']['file'] if 'file' in job_info['job'] else False
@@ -195,19 +208,45 @@ class Printer:
             progress = job_info['progress'] if 'progress' in job_info else False
             if progress is not False:
                 completion = progress['completion'] if 'completion' in progress else 0
-                history['job']['completion'] = str(completion).split('.')[0] + "%"
+                if completion is not None:
+                    history['job']['completion'] = str(completion).split('.')[0] + "%"
+                printtimeleft = progress['printTimeLeft'] if 'printTimeLeft' in progress else 0
+                if printtimeleft is not None:
+                    history['job']['left_time'] = printtimeleft
 
                 printTime = progress['printTime'] if 'printTime' in progress else 0
-                history['job']['printTime'] = str(datetime.timedelta(seconds=printTime)).split('.')[0] if printTime is not None else "00:00:00"
+                history['job']['printTime'] = str(datetime.timedelta(seconds=printTime)).split('.')[
+                    0] if printTime is not None else "00:00:00"
 
                 PrintTimeLeft = progress['printTimeLeft'] if 'printTimeLeft' in progress else 0
-                history['job']['printTimeLeft'] = str(datetime.timedelta(seconds=PrintTimeLeft)).split('.')[0] if PrintTimeLeft is not None else "00:00:00"
+                history['job']['printTimeLeft'] = str(datetime.timedelta(seconds=PrintTimeLeft)).split('.')[
+                    0] if PrintTimeLeft is not None else "00:00:00"
 
             last_job = job_info['lastPrintTime'] if 'lastPrintTime' in job_info else False
             if last_job is not False:
-                history['job']['lastPrintTime'] = str(datetime.timedelta(seconds=last_job)).split('.')[0] if last_job is not None else "00:00:00"
+                history['job']['lastPrintTime'] = str(datetime.timedelta(seconds=last_job)).split('.')[
+                    0] if last_job is not None else "00:00:00"
 
         return history
+
+    @staticmethod
+    def history_threads():
+        history = []
+        ptime = 0
+        printers = Printer.all()
+
+        with concurrent.futures.ThreadPoolExecutor(16) as executor:
+            future = [executor.submit(Printer.do_history, printer._id) for printer in printers]
+
+            for f in concurrent.futures.as_completed(future, timeout=60):
+                result = f.result()
+                if result['job']['left_time'] > ptime:
+                    ptime = result['job']['left_time']
+
+                history.append(result)
+
+        left_time = ptime * 1000
+        return history, left_time
 
     @classmethod
     def find_one_by(cls, attribute, value):
@@ -273,20 +312,3 @@ class Printer:
         if 'tool0' in temps:
             return temps['tool0']['target']
         return False
-
-    @staticmethod
-    def get_time_left(printers):
-        time = 0
-        for printer in printers:
-            if printer.get_flag_printing() is not False:
-                job_info = printer.get_job_info()
-                job = job_info['job'] if 'job' in job_info else False
-                if job is not False:
-                    progress = job_info['progress'] if 'progress' in job_info else False
-                    if progress is not False:
-                        PrintTimeLeft = progress['printTimeLeft'] if 'printTimeLeft' in progress else 0
-                        if PrintTimeLeft is not None and PrintTimeLeft > time:
-                            time = PrintTimeLeft
-
-        left_time = time * 1000
-        return left_time

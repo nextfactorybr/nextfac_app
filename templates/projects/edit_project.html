@@ -17,18 +17,7 @@
             <div class="form-group input-group col">
             <input class="form-control" type="text" id="weight" name="weight" placeholder="Weight" value={{project.weight}} required/>
             </div>
-            <div class="form-group input-group col-md-5">
-            <div class="input-group-prepend">
-                <label class="input-group-text" for="shift_id">Shift</label>
-            </div>
-              <select class="custom-select" name="shift_id" id="shift_id" required>
-                <option value={{project.shift_id}} selected>{{project.shift.desc}}</option>
-                {% for shift in project.shift.all() | sort(attribute='timein') %}
-                 <option value="{{shift._id}}">{{shift.desc}}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="form-group input-group col">
+            <div class="form-group input-group">
             <input class="form-control" type="text" id="path" name="path" placeholder="Path of file" value={{project.path}} required/>
             </div>
             </div>

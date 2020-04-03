@@ -93,6 +93,7 @@ def edit_shift(shift_id):
 
 @shift_blueprints.route('/delete/<string:shift_id>', methods=['GET'])
 @requires_login
+@requires_admin
 def remove_shift(shift_id):
     shift = Shift.get_by_id(shift_id)
     shift.remove_from_mongo()

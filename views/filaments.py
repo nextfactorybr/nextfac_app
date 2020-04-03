@@ -107,6 +107,7 @@ def edit_filament(filament_id):
 
 @filament_blueprints.route('/delete/<string:filament_id>', methods=['GET'])
 @requires_login
+@requires_admin
 def remove_filament(filament_id):
     filament = Filament.get_by_id(filament_id)
     filament.remove_from_mongo()

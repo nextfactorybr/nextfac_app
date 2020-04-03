@@ -22,12 +22,6 @@ function load(){
         headers: { "cache-control": "no-cache" },
         url: '/printers/dashboard_update',
 
-        beforeSend: function () {
-            if (msj !== null){
-                msj.innerHTML = "Reloading... Please wait, this may take a while depending on the number of printers connected!";
-            }
-        },
-
         success: function (data) {
             $("#render_dashboard").html(data.result);
             if (msj !== null){
@@ -37,7 +31,7 @@ function load(){
 
         complete: function() {
             // Schedule the next request when the current one's complete
-            setTimeout(load, 20000);
+            setTimeout(load, 3000);
         }
     });
 // end

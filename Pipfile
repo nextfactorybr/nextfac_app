@@ -21,6 +21,7 @@ python-dotenv = "*"
 flask-blueprint = "*"
 flask-dropzone = "*"
 csrf = "*"
+flask-wtf = "*"
 
 [requires]
 python_version = "3.8"

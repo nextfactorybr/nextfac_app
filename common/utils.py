@@ -1,3 +1,4 @@
+import math
 import re
 import datetime
 
@@ -32,12 +33,21 @@ class Utils:
 
             if re_value:
                 value = str(re_value.group().split(': ')[1])
-                clean_value_hour = re.sub('hours', 'hour', value)
-                clean_value_minutes = re.sub('minutes', 'minute', clean_value_hour)
-                strtotime = datetime.datetime.strptime(clean_value_minutes, '%H hour %M minute').time().strftime("%H:%M")
+                value = re.sub('hours', 'hour', value)
+                value = re.sub('minutes', 'minute', value)
+                value = re.sub(' hour ', ':', value)
+                value = re.sub(' minute', '', value)
+                clean_time = value.split(':')
+                if len(clean_time) > 1:
+                    hours = float(clean_time[0])
+                    minutes = float(clean_time[1])
+                    strtotime = datetime.timedelta(hours=hours, minutes=minutes).total_seconds()
+                if len(clean_time) == 1:
+                    minutes = float(clean_time[0])
+                    strtotime = datetime.timedelta(minutes=minutes).total_seconds()
                 return strtotime
             else:
-                value = '00:00'
+                value = 0
             return value
 
     @staticmethod
@@ -53,5 +63,3 @@ class Utils:
             else:
                 value = '0'
             return value
-
-

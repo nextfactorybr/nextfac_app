@@ -96,6 +96,7 @@ def edit_printer(printer_id):
 
 @printer_blueprints.route('/delete/<string:printer_id>', methods=['GET'])
 @requires_login
+@requires_admin
 def remove_printer(printer_id):
     printer = Printer.get_by_id(printer_id)
     printer.remove_from_mongo()
@@ -144,9 +145,8 @@ def dashboard():
 @printer_blueprints.route('/dashboard_update', methods=['GET'])
 @requires_login
 def dashboard_update():
-    printers = Printer.all()
-    left_time = Printer.get_time_left(printers)
-    result = render_template('printers/partial_dashboard.html', printers=printers, left_time=left_time)
+    history, left_time = Printer.history_threads()
+    result = render_template('printers/thread_dashboard.html', history=history, left_time=left_time)
     return jsonify(result=result)
 
 

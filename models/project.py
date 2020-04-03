@@ -2,21 +2,16 @@ import datetime
 import uuid
 from typing import Dict
 
-import pymongo
-
 from common.Database import Database
-from models.shift import Shift
 
 
 class Project:
     collection = "projects"
 
-    def __init__(self, name: str, time: datetime, weight: float, shift_id: str, path: str, _id: str = None):
+    def __init__(self, name: str, time: datetime, weight: float, path: str, _id: str = None):
         self.name = name
         self.time = time
         self.weight = weight
-        self.shift_id = shift_id
-        self.shift = Shift.get_by_id(self.shift_id)
         self.path = path
         self.collection = "projects"
         self._id = _id or uuid.uuid4().hex
@@ -27,7 +22,6 @@ class Project:
             "name": self.name,
             "time": self.time,
             "weight": self.weight,
-            "shift_id": self.shift_id,
             "path": self.path
         }
 
@@ -52,7 +46,7 @@ class Project:
         return cls.find_one_by("_id", _id)
 
     @classmethod
-    def all(cls,  skip=0, limit=0):
+    def all(cls, skip=0, limit=0):
         result = Database.find("projects", {}).sort("name").skip(skip).limit(limit)
         return [cls(**project) for project in result] if result else None
 
@@ -64,5 +58,5 @@ class Project:
                     {"name": {"$regex": parameter, "$options": 'i'}},
                     {"path": {"$regex": parameter, "$options": 'i'}}
                 ]
-             })
+            })
         return [cls(**elem) for elem in result] if result else None

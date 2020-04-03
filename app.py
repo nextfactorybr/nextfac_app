@@ -9,6 +9,7 @@ from views.shifts import shift_blueprints
 from views.projects import project_blueprints
 from views.filaments import filament_blueprints
 from views.users import user_blueprints
+from flask_wtf.csrf import CSRFProtect
 
 base_path = os.path.abspath(os.path.dirname(__file__))
 upload_path = os.path.join(base_path, 'static/gcodes/files/')
@@ -16,6 +17,7 @@ temp_path = os.path.join(base_path, 'static/gcodes/temporal/')
 
 app = Flask(__name__)
 dropzone = Dropzone(app)
+#csrf = CSRFProtect(app)
 app.secret_key = 'cd48e1c22de0961d5d1bfb14f8a66e006cfb1cfbf3f0c0f3'
 #app.config['DROPZONE_ENABLE_CSRF'] = True   #CSRF Protection Enabled
 app.config['DROPZONE_UPLOAD_MULTIPLE'] = True  # enable parallel upload

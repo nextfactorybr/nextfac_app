@@ -1,11 +1,11 @@
 import re
+import datetime
 
 from flask import Blueprint, request, render_template, make_response, redirect, url_for, flash, Markup, current_app
 from flask_paginate import Pagination, get_page_parameter
 from werkzeug.utils import secure_filename
 
 from models.project import Project
-from models.shift import Shift
 from models.user.decorators import requires_login, requires_admin
 from common.utils import Utils
 import os
@@ -26,7 +26,7 @@ view = {
 def index():
     page = request.args.get(get_page_parameter(), type=int, default=1)
 
-    per_page = 6
+    per_page = 8
     offset = (page - 1) * per_page if page > 0 else 1
 
     projects = Project.all(offset, per_page)
@@ -78,28 +78,57 @@ def search():
 @requires_login
 def new_project():
     if request.method == 'POST':
-        name = request.form['name']
-        time = request.form['time']
-        weight = request.form['weight']
-        shift_id = request.form['shift_id']
-        path = request.form['path']
+        file = request.files['file']
 
-        if Project.find_one_by("name", name):
-            message = Markup('<i class="fa fa-warning"></i> Error: The project you are trying to create already exist.')
-            flash(message, 'warning')
-            view['title'] = "New project"
-            view['search_on'] = False
-            shifts = Shift.all()
-            return render_template('projects/new_project.html', shifts=shifts, view=view)
+        if file.filename.split('.')[1] != 'gcode':
+            return 'Gcode only', 400
+
+        temp_path = current_app.config.get('TEMPORAL_FOLDER', '')
+
+        if not os.path.exists(temp_path):
+            os.makedirs(temp_path)
+
+        file_url_temp = os.path.join(temp_path, secure_filename(file.filename))
+        file.save(file_url_temp)
+
+        name = re.sub('.gcode', '', str(file.filename))
+        time = Utils.get_print_time(file_url_temp)
+        weight = Utils.get_weight(file_url_temp)
+
+        upd_project = Project.find_one_by("name", name)
+        if upd_project:
+
+            upload_path = current_app.config.get('UPLOAD_FOLDER', '')
+
+            if not os.path.exists(upload_path):
+                os.makedirs(upload_path)
+
+            file_url = os.path.join(upload_path, secure_filename(file.filename))
+            os.replace(file_url_temp, file_url)
+            path = file_url
+
+            upd_project.name = name
+            upd_project.time = time
+            upd_project.weight = weight
+            upd_project.path = path
+
+            upd_project.save_to_mongo()
+            return "The project was updated!", 200
         else:
-            Project(name, time, weight, shift_id, path).save_to_mongo()
-            flash('The project was successfully created!', 'success')
-            return redirect(url_for('projects.index'))
+            upload_path = current_app.config.get('UPLOAD_FOLDER', '')
+
+            if not os.path.exists(upload_path):
+                os.makedirs(upload_path)
+
+            file_url = os.path.join(upload_path, secure_filename(file.filename))
+            os.replace(file_url_temp, file_url)
+            path = file_url
+            Project(name, time, weight, path).save_to_mongo()
+            return "Upload project successfully", 200
     else:
-        view['title'] = "New project"
+        view['title'] = "New Project"
         view['search_on'] = False
-        shifts = Shift.all()
-        return render_template('projects/new_project.html', shifts=shifts, view=view)
+        return render_template('projects/dragndrop.html', view=view)
 
 
 @project_blueprints.route('/edit/<string:project_id>', methods=['GET', 'POST'])
@@ -111,7 +140,6 @@ def edit_project(project_id):
         project.name = request.form['name']
         project.time = request.form['time']
         project.weight = request.form['weight']
-        project.shift_id = request.form['shift_id']
         project.path = request.form['path']
 
         x_project = Project.find_one_by("name", project.name)
@@ -134,6 +162,7 @@ def edit_project(project_id):
 
 @project_blueprints.route('/delete/<string:project_id>', methods=['GET'])
 @requires_login
+@requires_admin
 def remove_project(project_id):
     project = Project.get_by_id(project_id)
     file_url = project.path
@@ -141,37 +170,3 @@ def remove_project(project_id):
     project.remove_from_mongo()
     flash('The project was deleted!', 'danger')
     return redirect(url_for('projects.index'))
-
-
-@project_blueprints.route('/dragndrop', methods=['GET', 'POST'])
-@requires_login
-def dragndrop():
-    if request.method == 'POST':
-        file = request.files['file']
-
-        if file.filename.split('.')[1] != 'gcode':
-            return 'Gcode only', 400
-
-        temp_path = current_app.config.get('TEMPORAL_FOLDER', '')
-        file_url_temp = os.path.join(temp_path, secure_filename(file.filename))
-        file.save(file_url_temp)
-
-        name = re.sub('.gcode', '', str(file.filename))
-        time = Utils.get_print_time(file_url_temp)
-        weight = Utils.get_weight(file_url_temp)
-        shift_id = "bff61902d02b4e029444fb0d2d4d702d"
-
-        if Project.find_one_by("name", name):
-            os.remove(file_url_temp)
-            return "This file already exists, please delete it first!", 400
-        else:
-            upload_path = current_app.config.get('UPLOAD_FOLDER', '')
-            file_url = os.path.join(upload_path, secure_filename(file.filename))
-            os.replace(file_url_temp, file_url)
-            path = file_url
-            Project(name, time, weight, shift_id, path).save_to_mongo()
-            return "Upload project successfully", 200
-    else:
-        view['title'] = "DragnDrop"
-        view['search_on'] = False
-        return render_template('projects/dragndrop.html', view=view)
