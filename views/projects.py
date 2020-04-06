@@ -80,9 +80,6 @@ def new_project():
     if request.method == 'POST':
         file = request.files['file']
 
-        if file.filename.split('.')[1] != 'gcode':
-            return 'Gcode only', 400
-
         temp_path = current_app.config.get('TEMPORAL_FOLDER', '')
 
         if not os.path.exists(temp_path):

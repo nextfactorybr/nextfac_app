@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% block  content%}
+    {{ dropzone.load_css() }}
+    {{ dropzone.load_js() }}
     <section class="dragndrop">
         <form action="/projects/new" method="post" class="dropzone dz-clickable mb-5" id="myDropzone" enctype="multipart/form-data">
             <div class="dz-default dz-message justify-content-center align-items-center pt-4">

@@ -20,8 +20,12 @@ dropzone = Dropzone(app)
 #csrf = CSRFProtect(app)
 app.secret_key = 'cd48e1c22de0961d5d1bfb14f8a66e006cfb1cfbf3f0c0f3'
 #app.config['DROPZONE_ENABLE_CSRF'] = True   #CSRF Protection Enabled
-app.config['DROPZONE_UPLOAD_MULTIPLE'] = True  # enable parallel upload
+app.config['DROPZONE_UPLOAD_MULTIPLE'] = False  # enable parallel upload
 app.config['DROPZONE_PARALLEL_UPLOADS'] = 3  # handle 3 file per request
+app.config['DROPZONE_ALLOWED_FILE_CUSTOM'] = True
+app.config['DROPZONE_ALLOWED_FILE_TYPE'] = '.gcode, .gco'
+app.config['DROPZONE_TIMEOUT'] = 150000
+app.config['DROPZONE_MAX_FILE_SIZE'] = 200
 app.config.update(
     ADMIN=os.environ.get('ADMIN'),
     UPLOAD_FOLDER=upload_path,
