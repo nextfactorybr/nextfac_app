@@ -1,12 +1,15 @@
 import uuid
 from typing import Dict
 
+
 from octorest import OctoRest
 from common.Database import Database
 import json
 import datetime
 import time
 import concurrent.futures
+import socket
+from urllib.parse import urlparse
 
 
 class Printer:
@@ -35,13 +38,33 @@ class Printer:
     def remove_from_mongo(self):
         Database.remove(self.collection, {"_id": self._id})
 
-    def con(self):
+    def check_socket(self):
+        parse_url = urlparse(self.url)
+        hostname = parse_url.hostname
+        if parse_url.port is None:
+            if parse_url.scheme == 'https':
+                port = 443
+            else:
+                port = 80
+        else:
+            port = parse_url.port
         try:
-            con = OctoRest(url=self.url, apikey=self.apikey)
-        except Exception as e:
+            sock = socket.create_connection((hostname, port), timeout=2)
+        except:
             return False
         else:
-            return con
+            return True
+
+    def con(self):
+        if self.check_socket():
+            try:
+                con = OctoRest(url=self.url, apikey=self.apikey)
+            except Exception as e:
+                return False
+            else:
+                return con
+        else:
+            return False
 
     def state(self):
         if isinstance(self.con(), bool):

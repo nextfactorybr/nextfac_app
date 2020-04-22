@@ -12,6 +12,7 @@ from views.users import user_blueprints
 from flask_wtf.csrf import CSRFProtect
 
 base_path = os.path.abspath(os.path.dirname(__file__))
+
 upload_path = os.path.join(base_path, 'static/gcodes/files/')
 temp_path = os.path.join(base_path, 'static/gcodes/temporal/')
 
@@ -51,4 +52,4 @@ app.register_blueprint(user_blueprints, url_prefix="/auth")
 app.jinja_env.globals['static'] = helpers.static_file
 
 if __name__ == '__main__':
-    app.run(host='nextfactory.casaz.com.br', port=80, debug=True)
+    app.run(host='192.168.0.127', port=80, debug=True)
